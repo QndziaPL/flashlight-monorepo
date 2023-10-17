@@ -20,9 +20,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Elo kurwy");
 });
 
-app.listen(httpPort, () => console.log(`Napierdala na porcie: ${httpPort}`));
+app.listen(httpPort, () => console.log(`Http napierdala na porcie: ${httpPort}`));
 
 io.on("connection", (socket) => {
+  console.log(`Podłączono klienta o id: ${socket.id}`);
   socket.emit("initialMessage", "MAMY KLIENTA");
   socket.on("playerShoot", (msg) => {
     socket.emit("afterShoot", `zakurwiłeś pizdo na ${msg.x}x${msg.y}`);
