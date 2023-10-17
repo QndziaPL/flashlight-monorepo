@@ -1,6 +1,6 @@
 import { Drawable } from "../types/gameObjectTypes.ts";
 import Wall from "./Wall/Wall.ts";
-import Vector2 from "../Vector2.ts";
+import Vector2 from "../../../../shared/classes/Vector2.ts";
 
 export default class Environment {
   #drawables: Drawable[] = [dziaua, niedziaua, crookedWall, crookedHorizontal];

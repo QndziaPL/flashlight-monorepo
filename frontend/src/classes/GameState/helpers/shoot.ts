@@ -1,6 +1,6 @@
-import Vector2 from "../../Vector2.ts";
 import Projectile from "../../Projectile.ts";
 import GameState from "../GameState.ts";
+import Vector2 from "../../../../../shared/classes/Vector2.ts";
 
 export const shoot = (gameState: GameState) => {
   const playerPosition = gameState.players[0].position.clone();

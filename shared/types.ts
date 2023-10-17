@@ -1,1 +1,1 @@
-export type TestType = { dupa: string; cyce: boolean };
+export type XYNumericValues = { x: number; y: number };

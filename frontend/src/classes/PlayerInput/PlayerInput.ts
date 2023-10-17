@@ -1,4 +1,4 @@
-import Vector2 from "../Vector2.ts";
+import Vector2 from "../../../../shared/classes/Vector2.ts";
 
 export type MouseInput = {
   pressed: boolean;
@@ -16,6 +16,7 @@ export default class PlayerInput {
     }),
   };
   #keyBindings: KeyBindings = {};
+
   constructor() {
     addEventListener("keydown", this.#handleOnKey("keydown"));
     addEventListener("keyup", this.#handleOnKey("keyup"));

@@ -1,7 +1,7 @@
 import Projectile from "../../Projectile.ts";
 import Environment from "../../Environment/Environment.ts";
 import { Collider } from "../../types/gameObjectTypes.ts";
-import Vector2 from "../../Vector2.ts";
+import Vector2 from "../../../../../shared/classes/Vector2.ts";
 
 const COLLISION_MARGIN = 0.3;
 export const checkProjectileCollisions = (projectiles: Projectile[], environment: Environment) => {

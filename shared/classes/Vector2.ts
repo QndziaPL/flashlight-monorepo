@@ -1,8 +1,9 @@
-import { XYNumericValues } from "./GameState/GameState.ts";
+import { XYNumericValues } from "../types";
 
 export default class Vector2 {
   x: number;
   y: number;
+
   constructor({ x, y }: XYNumericValues);
   constructor(x: number, y: number);
   constructor(param1: any, param2?: any) {
@@ -78,6 +79,7 @@ export default class Vector2 {
   static CreateMany(...props: XYNumericValues[]): Vector2[] {
     return props.map((p) => new Vector2(p.x, p.y));
   }
+
   /**
    * Check if two line segments defined by points (p1, p2) and (q1, q2) intersect.
    * @param p1 - Start point of the first line segment.

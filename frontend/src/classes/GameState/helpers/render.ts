@@ -1,8 +1,9 @@
 import Player from "../../Player.ts";
 import Projectile from "../../Projectile.ts";
-import Vector2 from "../../Vector2.ts";
+
 import GameState from "../GameState.ts";
 import { Drawable } from "../../types/gameObjectTypes.ts";
+import Vector2 from "../../../../../shared/classes/Vector2.ts";
 
 export const renderPlayers = (ctx: CanvasRenderingContext2D, players: Player[]) => {
   players.forEach(({ position: { x, y }, sizeRadius, name, color }) => {

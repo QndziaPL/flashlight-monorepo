@@ -1,5 +1,5 @@
 import { Collider, Drawable } from "../../types/gameObjectTypes.ts";
-import Vector2 from "../../Vector2.ts";
+import Vector2 from "../../../../../shared/classes/Vector2.ts";
 
 export type WallConstructorProps = {
   points: Vector2[];
@@ -7,6 +7,7 @@ export type WallConstructorProps = {
 export default class Wall implements Drawable, Collider {
   #points: WallConstructorProps["points"];
   readonly collider = true;
+
   constructor({ points }: WallConstructorProps) {
     this.#points = points;
   }

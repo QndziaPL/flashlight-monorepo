@@ -2,15 +2,13 @@ import Player from "../Player.ts";
 import { renderFlashlight, renderFPS, renderGround, renderPlayers, renderProjectiles } from "./helpers/render.ts";
 import PlayerInput, { KeyBindings } from "../PlayerInput/PlayerInput.ts";
 import { FPSDebug, updateFpsDebugVariables } from "./helpers/debug.ts";
-import Vector2 from "../Vector2.ts";
+import Vector2 from "../../../../shared/classes/Vector2.ts";
 import Projectile from "../Projectile.ts";
 import { updateProjectiles } from "./helpers/updateProjectiles.ts";
 import Environment from "../Environment/Environment.ts";
 import { checkProjectileCollisions } from "./helpers/checkProjectileCollisions.ts";
 import { shoot } from "./helpers/shoot.ts";
 import { Socket } from "socket.io-client";
-
-export type XYNumericValues = { x: number; y: number };
 
 export type GameStateConstructorProps = {
   canvasRef: HTMLCanvasElement;

@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { Movable, Shootable } from "./types/gameObjectTypes.ts";
-import Vector2 from "./Vector2.ts";
+import Vector2 from "@shared/classes/Vector2.ts";
 
 export const DEFAULT_PLAYER_CONSTS = {
   movementSpeed: 500,
@@ -29,6 +29,7 @@ export default class Player implements Movable, Shootable {
     radius: 100,
     angle: 20,
   };
+
   constructor({
     name,
     initialPosition,

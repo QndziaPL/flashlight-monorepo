@@ -1,5 +1,5 @@
 import { Movable } from "./types/gameObjectTypes.ts";
-import Vector2 from "./Vector2.ts";
+import Vector2 from "../../../shared/classes/Vector2.ts";
 
 export type ProjectileConstructorProps = {
   position: Vector2;
