@@ -1,0 +1,13 @@
+{
+  "name": "my-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm recursive exec pnpm run build",
+    "dev": "concurrently \"cd frontend && pnpm run dev\" \"cd backend && pnpm run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1",
+    "prettier": "^3.0.3"
+  }
+}
