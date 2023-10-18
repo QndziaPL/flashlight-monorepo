@@ -26,6 +26,7 @@ jobs:
 
       - name: Build TypeScript
         run: pnpm run build
+        working-directory: backend
 
       - name: Zip artifact for deployment
         run: zip release.zip -r .
