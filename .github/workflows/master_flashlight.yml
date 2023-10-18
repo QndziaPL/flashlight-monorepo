@@ -1,4 +1,7 @@
-name: Build and deploy Node.js app with TypeScript to Azure Web App - flashlight
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - flashlight
 
 on:
   push:
@@ -16,29 +19,16 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v1
         with:
-          node-version: "16.14"
+          node-version: '18.x'
 
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install Node.js dependencies
-        run: pnpm install
-
-      - name: Build TypeScript
-        run: pnpm run build
-        working-directory: backend
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
-
-      - name: Measure ZIP file size
-        run: |
-          # Calculate the size of the ZIP file
-          ZIP_SIZE=$(du -h release.zip | cut -f1)
-          
-          # Log the size of the ZIP file
-          echo "Size of ZIP file: $ZIP_SIZE"
-        working-directory: backend
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -68,13 +58,5 @@ jobs:
         with:
           app-name: 'flashlight'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F7344A5AC68446CDA928161085C9B7B6 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_541F0484D3E744BC99AD55B2B93DE50D }}
           package: .
-
-      - name: Install production dependencies
-        run: pnpm ci --production
-        working-directory: backend
-
-      - name: Start Express server
-        run: pnpm start
-        working-directory: backend
