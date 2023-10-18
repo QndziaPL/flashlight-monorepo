@@ -21,15 +21,15 @@ jobs:
         with:
           node-version: '16.14'
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Clear cache
+        run: npm cache clean --force
 
       - name: Install backend dependencies
-        run: pnpm install
+        run: npm install
         working-directory: backend
 
       - name: Compile typescript backend
-        run: pnpm run build
+        run: npm run build
         working-directory: backend
 
       - name: Run backend tests
