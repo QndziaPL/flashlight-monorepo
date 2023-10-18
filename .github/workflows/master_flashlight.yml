@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - flashlight
+name: Build and deploy Node.js app with TypeScript to Azure Web App - flashlight
 
 on:
   push:
@@ -14,24 +11,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
 
       - name: Set up Node.js version
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: '18.x'
+          node-version: '14' # Adjust the Node.js version as needed
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Node.js dependencies
+        run: pnpm install
+
+      - name: Build TypeScript
+        run: pnpm run build
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: zip release.zip -r .
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: node-app
           path: release.zip
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: node-app
 
@@ -60,3 +60,11 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F7344A5AC68446CDA928161085C9B7B6 }}
           package: .
+
+      - name: Install production dependencies
+        run: pnpm ci --production
+        working-directory: backend
+
+      - name: Start Express server
+        run: pnpm start
+        working-directory: backend
