@@ -1,4 +1,4 @@
-import Vector2 from "@shared/classes/Vector2.ts";
+import Vector2 from "../../../../shared/classes/Vector2.ts";
 
 export type MoveWithVector = (vector: Vector2, deltaTime: number) => void;
 export type MoveWithoutVector = (deltaTime: number) => void;
