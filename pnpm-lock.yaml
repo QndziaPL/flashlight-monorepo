@@ -11,6 +11,9 @@ importers:
       concurrently:
         specifier: ^8.2.1
         version: 8.2.1
+      husky:
+        specifier: ^8.0.3
+        version: 8.0.3
       prettier:
         specifier: ^3.0.3
         version: 3.0.3
@@ -106,9 +109,6 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.4.3
         version: 0.4.3(eslint@8.51.0)
-      husky:
-        specifier: ^8.0.0
-        version: 8.0.3
       lint-staged:
         specifier: 14.0.1
         version: 14.0.1
