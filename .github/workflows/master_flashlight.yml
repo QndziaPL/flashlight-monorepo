@@ -74,5 +74,5 @@ jobs:
 
       - name: Run pnpm start on Azure Web App
         run: |
-          az webapp log tail --ids flashlight --name flashlight --resource-group YourResourceGroup
+          az webapp log tail --name flashlight --resource-group flashlight
           pnpm run start
