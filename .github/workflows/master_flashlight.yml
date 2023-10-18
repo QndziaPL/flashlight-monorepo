@@ -31,6 +31,15 @@ jobs:
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
+      - name: Measure ZIP file size
+        run: |
+          # Calculate the size of the ZIP file
+          ZIP_SIZE=$(du -h release.zip | cut -f1)
+          
+          # Log the size of the ZIP file
+          echo "Size of ZIP file: $ZIP_SIZE"
+        working-directory: backend
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
