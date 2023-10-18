@@ -36,7 +36,7 @@ jobs:
         run: echo "No tests yet, TBD"
 
       - name: Zip artifact for deployment
-        run: zip release.zip backend/dist -r
+        run: zip -r release.zip backend
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
