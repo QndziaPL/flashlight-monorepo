@@ -73,6 +73,4 @@ jobs:
           package: .
 
       - name: Run pnpm start on Azure Web App
-        run: |
-          az webapp log tail --name flashlight --resource-group flashlight
-          pnpm run start
+        run: pnpm run start
