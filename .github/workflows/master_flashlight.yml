@@ -24,6 +24,12 @@ jobs:
       - name: Clear cache
         run: npm cache clean --force
 
+      - name: Remove lock files and node_modules
+        run: |
+          rm -f package-lock.json
+          rm -f pnpm-lock.yaml
+          rm -rf node_modules
+
       - name: Install backend dependencies
         run: npm install
         working-directory: backend
