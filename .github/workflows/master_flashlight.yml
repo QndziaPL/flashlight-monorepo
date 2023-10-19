@@ -81,4 +81,5 @@ jobs:
         run: |
           npm install pm2 -g
           pm2 start dist/index.js
+          sudo pm2 list
         working-directory: backend
