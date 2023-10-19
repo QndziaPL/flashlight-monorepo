@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useRef } from "react";
+import { createContext, ReactNode, useContext, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 
 const SocketContext = createContext({} as SocketContextValue);
@@ -10,7 +10,18 @@ export type SocketContextValue = {
 };
 
 export const SocketContextProvider = ({ children }: { children: ReactNode }) => {
-  const { current: socket } = useRef(io("http://localhost:8080"));
+  //todo: adres do ustawienia z enva (prod dla azure, dev localhost)
+  const { current: socket } = useRef(io("http://localhost"));
+
+  useEffect(() => {
+    fetch("http://localhost:80").then((d) => console.log(d));
+  }, []);
+
+  console.log(socket);
+  socket.on("connect", () => {
+    console.log("front podłączony");
+  });
+  socket.emit("FE_CONNECTED", "FE podłączony");
 
   return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>;
 };

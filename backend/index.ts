@@ -2,26 +2,26 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application, Request, Response } from "express";
 import { Server } from "socket.io";
+import http from "http";
 
 dotenv.config();
 
 const app: Application = express();
-
-const httpPort = 8000;
-const wsPort = 8080;
-
 app.use(cors({ origin: "*" }));
 
-const io = new Server(wsPort, {
+const server = http.createServer(app);
+
+const port = 80;
+
+const io = new Server(server, {
   cors: { origin: "*" },
-  // cors: { origin: "http://localhost:5173" },
 });
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Elo kurwy");
 });
 
-app.listen(httpPort, () => console.log(`Http napierdala na porcie: ${httpPort}`));
+server.listen(port, () => console.log(`Http napierdala na porcie: ${port}`));
 
 io.on("connection", (socket) => {
   console.log(`Podłączono klienta o id: ${socket.id}`);
@@ -29,4 +29,8 @@ io.on("connection", (socket) => {
   socket.on("playerShoot", (msg) => {
     socket.emit("afterShoot", `zakurwiłeś pizdo na ${msg.x}x${msg.y}`);
   });
+});
+
+io.on("FE_CONNECTED", (msg) => {
+  console.log(msg);
 });
