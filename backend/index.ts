@@ -10,7 +10,7 @@ const app: Application = express();
 const httpPort = 8000;
 const wsPort = 8080;
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 
 const io = new Server(wsPort, {
   cors: { origin: "*" },
