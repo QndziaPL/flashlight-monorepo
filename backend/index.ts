@@ -13,7 +13,8 @@ const wsPort = 8080;
 app.use(cors());
 
 const io = new Server(wsPort, {
-  cors: { origin: "http://localhost:5173" },
+  cors: { origin: "*" },
+  // cors: { origin: "http://localhost:5173" },
 });
 
 app.get("/", (req: Request, res: Response) => {
