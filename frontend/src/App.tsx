@@ -1,42 +1,24 @@
-import { useEffect, useRef, useState } from "react";
-import GameState from "./classes/GameState/GameState.ts";
 import "./App.css";
-import PlayerInput from "./classes/PlayerInput/PlayerInput.ts";
-import { useSocket } from "./context/socketContext.tsx";
+import { Game } from "./components/Game.tsx";
+import { ConnectionMode, useAppContext } from "./context/AppContext.tsx";
+import { ChooseModeScreen } from "./screens/ChooseModeScreen.tsx";
+import { JoinScreen } from "./screens/JoinScreen.tsx";
+import { HostScreen } from "./screens/HostScreen.tsx";
 
 const App = () => {
-  const { socket } = useSocket();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [gameState, setGameState] = useState<GameState>();
+  const { mode, setMode, hosted } = useAppContext();
 
-  useEffect(() => {
-    if (canvasRef.current) {
-      canvasRef.current.height = window.innerHeight;
-      canvasRef.current.width = window.innerWidth;
-      setGameState(new GameState({ canvasRef: canvasRef.current, playerInput: new PlayerInput(), socket }));
-    }
-  }, []);
+  if (mode === ConnectionMode.NOT_SELECTED) {
+    return <ChooseModeScreen />;
+  }
 
-  useEffect(() => {}, []);
+  if (mode === ConnectionMode.JOIN) {
+    return <JoinScreen />;
+  }
 
-  useEffect(() => {
-    const startGameLoop = () => {
-      gameState?.tick();
-
-      requestAnimationFrame(startGameLoop);
-    };
-
-    const frameId = requestAnimationFrame(startGameLoop);
-
-    return () => {
-      cancelAnimationFrame(frameId);
-    };
-  }, [gameState]);
-
-  return (
-    <div>
-      <canvas ref={canvasRef} />
-    </div>
-  );
+  if (mode === ConnectionMode.HOST && !hosted) {
+    return <HostScreen />;
+  }
+  return <Game />;
 };
 export default App;

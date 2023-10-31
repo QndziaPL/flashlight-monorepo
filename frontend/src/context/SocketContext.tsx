@@ -1,11 +1,11 @@
 import { createContext, ReactNode, useContext, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 
-const SocketContext = createContext({} as SocketContextValue);
+const SocketContext = createContext({} as SocketContextProps);
 
 export const useSocket = () => useContext(SocketContext);
 
-export type SocketContextValue = {
+export type SocketContextProps = {
   socket: Socket;
 };
 
