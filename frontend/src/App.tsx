@@ -2,7 +2,7 @@ import "./App.css";
 import { Game } from "./components/Game.tsx";
 import { ConnectionMode, useAppContext } from "./context/AppContext.tsx";
 import { ChooseModeScreen } from "./screens/ChooseModeScreen.tsx";
-import { JoinScreen } from "./screens/JoinScreen.tsx";
+import { JoinScreen } from "./screens/JoinScreen/JoinScreen.tsx";
 import { HostScreen } from "./screens/HostScreen.tsx";
 
 const App = () => {

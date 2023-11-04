@@ -1,0 +1,31 @@
+.lobbyList {
+  border: 1px solid black;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.listHeader {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1rem;
+
+  div {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+.singleLobby {
+  display: flex;
+  width: 100%;
+  padding: 1rem;
+  background-color: rgb(186, 255, 243);
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  border: 1px solid black;
+
+  div {
+    flex: 1;
+  }
+}

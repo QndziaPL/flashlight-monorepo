@@ -1,6 +1,8 @@
 import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
 import dotenv from "dotenv";
-import { collection, Firestore, getDocs, getFirestore } from "firebase/firestore";
+import { addDoc, collection, Firestore, getDocs, getFirestore } from "firebase/firestore";
+import { Lobby } from "../../shared/types";
+import { removeKeysWithUndefinedValues } from "../../shared/helpers/mappers";
 
 dotenv.config();
 
@@ -41,14 +43,16 @@ export class FirebaseClient {
     return this._db;
   }
 
-  async getCollection<T>(collectionName: string): Promise<T[] | undefined> {
+  async getCollection<T extends { id: string }>(collectionName: string): Promise<T[] | undefined> {
     try {
       const docRef = collection(this._db, collectionName);
       const querySnapshot = await getDocs(docRef);
 
       const documents: T[] = [];
       querySnapshot.forEach((doc) => {
-        documents.push(doc.data() as T);
+        console.log(doc.id);
+        const data = doc.data() as T;
+        documents.push({ ...data, id: doc.id });
       });
 
       return documents;
@@ -56,4 +60,18 @@ export class FirebaseClient {
       console.error(`Error getting collection "${collectionName}": ${error}`);
     }
   }
+
+  async createLobby(lobbyData: CreateLobbyProps) {
+    const lobbyRef = collection(this._db, "lobbys");
+    const preparedLobbyData = removeKeysWithUndefinedValues(lobbyData);
+    console.log(preparedLobbyData, "DATA KURWA");
+    try {
+      const docRef = await addDoc(lobbyRef, preparedLobbyData);
+      console.log(`Lobby created successfully with ID: ${docRef.id}`);
+    } catch (error) {
+      console.error(`Error creating lobby: ${error}. Data for creation: ${JSON.stringify(preparedLobbyData)}`);
+    }
+  }
 }
+
+export type CreateLobbyProps = Omit<Lobby, "id">;
