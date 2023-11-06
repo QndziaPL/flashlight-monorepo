@@ -14,18 +14,30 @@
     text-align: center;
     font-weight: bold;
   }
+
+  div:last-of-type {
+    flex: 0;
+  }
 }
 
 .singleLobby {
   display: flex;
   width: 100%;
   padding: 1rem;
-  background-color: rgb(186, 255, 243);
+  background-color: rgb(217, 249, 255);
   margin-bottom: 1rem;
   border-radius: 1rem;
   border: 1px solid black;
+  font-size: 0.7rem;
 
   div {
     flex: 1;
+    border-right: 1px solid black;
+    padding: 1rem;
+  }
+
+  div:last-of-type {
+    flex: 0;
+    border-right: none;
   }
 }

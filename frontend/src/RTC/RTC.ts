@@ -1,13 +1,10 @@
-const configuration = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-  // Add more WebRTC configuration options here
-};
-
-class WebRTCConfiguration {
+class WebRTCClient {
+  configuration: RTCConfiguration;
   connection: RTCPeerConnection;
 
-  constructor() {
-    this.connection = new RTCPeerConnection(configuration);
+  constructor(config: RTCConfiguration) {
+    this.configuration = config;
+    this.connection = new RTCPeerConnection(this.configuration);
   }
 
   // Getter method to access the WebRTC configuration
@@ -16,16 +13,33 @@ class WebRTCConfiguration {
   }
 
   // Setter method to modify the WebRTC configuration
-  setConfiguration(newConfig) {
+  setConfiguration(newConfig: RTCConfiguration) {
     this.configuration = { ...this.configuration, ...newConfig };
   }
 
   async createOffer() {
     const offer = await this.connection.createOffer();
     await this.connection.setLocalDescription(offer);
+
+    return this.connection.localDescription ?? undefined;
+  }
+
+  async createAnswer(offer?: RTCSessionDescriptionInit) {
+    if (!offer) throw new Error("No offer");
+    await this.connection.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await this.connection.createAnswer();
+
+    return answer;
+  }
+
+  public get signalingState(): RTCSignalingState {
+    return this.connection.signalingState;
   }
 }
 
-const webRTCConfig = new WebRTCConfiguration();
+const rtcConfiguration: RTCConfiguration = {
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+};
+const webRTCClient = new WebRTCClient(rtcConfiguration);
 
-export { webRTCConfig };
+export default webRTCClient;
