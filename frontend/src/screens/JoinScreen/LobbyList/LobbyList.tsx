@@ -1,27 +1,36 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import styles from "./LobbyList.module.scss";
 import { Lobby } from "../../../../../shared/types/lobby.ts";
 import RTC from "../../../RTC/RTC.ts";
-import { useSocket } from "../../../context/SocketContext.tsx";
+import webRTCClient from "../../../RTC/RTC.ts";
+import { useSocketContext } from "../../../context/SocketContext.tsx";
+import { formatTimestamp } from "./helpers.ts";
+import { RTCEventType } from "../../../../../shared/types/rtc.ts";
 
 export type LobbyListProps = {
   lobbys: Lobby[];
   deleteLobby: (lobbyId: Lobby["id"]) => Promise<void>;
+  refreshLobby: () => Promise<void>;
 };
-export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby }) => {
-  const { joinRoom } = useSocket();
+export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobby }) => {
+  const { joinRoom } = useSocketContext();
   const handleJoinLobby = async (lobbyId: Lobby["id"], offer?: RTCSessionDescriptionInit) => {
-    await RTC.createAnswer(offer);
-    joinRoom(lobbyId);
+    const answer = await RTC.createAnswer(offer);
+    joinRoom(lobbyId, answer);
   };
+
+  const [testInputValue, setTestInputValue] = useState("");
 
   return (
     <>
-      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>active lobbys</h1>
+      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>
+        active lobbys <button onClick={refreshLobby}>refresh</button>
+      </h1>
       <div className={styles.lobbyList}>
         <div className={styles.listHeader}>
           <div>ID</div>
           <div>NAME</div>
+          <div>CREATED AT</div>
           <div>HOST</div>
           <div>PLAYERS</div>
           <div>actions</div>
@@ -30,6 +39,7 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby }) => {
           <div key={lobby.id} className={styles.singleLobby}>
             <div>{lobby.id}</div>
             <div>{lobby.name}</div>
+            <div>{formatTimestamp(lobby.createdAt)}</div>
             <div>{lobby.hostId}</div>
             <div>
               <ol>
@@ -44,6 +54,12 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby }) => {
             </div>
           </div>
         ))}
+        <div style={{ margin: 20 }}>
+          <input type="text" value={testInputValue} onChange={(e) => setTestInputValue(e.target.value)} />
+          <button onClick={() => webRTCClient.sendMessage(RTCEventType.INFO, testInputValue)}>
+            SEND MESSAGE VIA WEBRTC
+          </button>
+        </div>
       </div>
     </>
   );

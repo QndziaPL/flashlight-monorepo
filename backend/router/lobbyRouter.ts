@@ -9,7 +9,7 @@ const firebase = FirebaseClient.getInstance();
 router.get(ROUTE, async (req: Request, res: Response) => {
     const lobbysData = await firebase.getCollection<Lobby>("lobbys");
     if (lobbysData) {
-        res.send(lobbysData);
+        res.send(lobbysData.sort((a, b) => a.createdAt > b.createdAt ? -1 : 1));
     } else {
         res.status(404).send("Could not find data");
     }
@@ -23,8 +23,6 @@ router.post(ROUTE, async (req: Request, res: Response) => {
         webrtc: req.body.webrtc,
         createdAt: Date.now()
     };
-
-    console.log(lobbyData, "LOBBY DATA IN POST CONTROLLER")
 
     const lobbyId = await firebase.createLobby(lobbyData);
     if (lobbyId) {

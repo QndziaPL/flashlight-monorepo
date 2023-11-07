@@ -20,9 +20,13 @@ export const JoinScreen: FC<JoinScreenProps> = () => {
   const getLobbysAPI = useApi<Lobby[]>([]);
   const deleteLobbyAPI = useApi();
 
+  const fetchLobbys = async () => {
+    await getLobbysAPI.call("/lobbys");
+  };
+
   const handleDeleteLobby = async (lobbyId: Lobby["id"]) => {
     await deleteLobbyAPI.call("/lobbys", { method: "DELETE", body: JSON.stringify({ lobbyId }) });
-    getLobbysAPI.call("/lobbys");
+    fetchLobbys();
   };
 
   return (
@@ -30,7 +34,7 @@ export const JoinScreen: FC<JoinScreenProps> = () => {
       {getLobbysAPI.loading && <p>loading lobbys...</p>}
       <h1>join game</h1>
 
-      <LobbyList lobbys={getLobbysAPI.data ?? []} deleteLobby={handleDeleteLobby} />
+      <LobbyList lobbys={getLobbysAPI.data ?? []} deleteLobby={handleDeleteLobby} refreshLobby={fetchLobbys} />
       <hr />
       <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} />
       <button disabled={!validAddress}>join</button>

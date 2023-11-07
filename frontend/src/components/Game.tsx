@@ -1,11 +1,11 @@
-import { useSocket } from "../context/SocketContext.tsx";
+import { useSocketContext } from "../context/SocketContext.tsx";
 import { FC, useEffect, useRef, useState } from "react";
 import GameState from "../classes/GameState/GameState.ts";
 import PlayerInput from "../classes/PlayerInput/PlayerInput.ts";
 
 export type GameProps = {};
 export const Game: FC<GameProps> = () => {
-  const { socket } = useSocket();
+  const { socket } = useSocketContext();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<GameState>();
 

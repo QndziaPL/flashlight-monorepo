@@ -3,14 +3,14 @@ import { useIpAddress } from "../../hooks/useIpAddress.ts";
 import { ConnectionMode, useAppContext } from "../../context/AppContext.tsx";
 import RTC from "../../RTC/RTC.ts";
 import { FECreateLobbyProps } from "../../../../shared/types/lobby.ts";
-import { useSocket } from "../../context/SocketContext.tsx";
+import { useSocketContext } from "../../context/SocketContext.tsx";
 import { useApi } from "../../hooks/useApi.ts";
 
 export type HostScreenProps = {};
 export const HostScreen: FC<HostScreenProps> = () => {
   const { ip, error, loading } = useIpAddress();
   const { setMode, clientId } = useAppContext();
-  const { socket, joinRoom } = useSocket();
+  const { socket, joinRoom } = useSocketContext();
   const [lobbyName, setLobbyName] = useState<string>("");
 
   const createLobbyAPI = useApi<{ lobbyId: string }>();
@@ -24,12 +24,6 @@ export const HostScreen: FC<HostScreenProps> = () => {
         offer,
       },
     };
-
-    // const response = await fetch("http://localhost/api/lobbys", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(createLobbyData),
-    // });
 
     const data = await createLobbyAPI.call("/lobbys", { method: "POST", body: JSON.stringify(createLobbyData) });
 

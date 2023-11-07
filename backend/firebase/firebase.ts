@@ -22,7 +22,6 @@ export class FirebaseClient {
     private _db: Firestore;
 
     private constructor() {
-        console.log(firebaseConfig);
         this._app = initializeApp(firebaseConfig);
         this._db = getFirestore(this._app);
     }
@@ -50,7 +49,6 @@ export class FirebaseClient {
 
             const documents: T[] = [];
             querySnapshot.forEach((doc) => {
-                console.log(doc.id);
                 const data = doc.data() as T;
                 documents.push({...data, id: doc.id});
             });
