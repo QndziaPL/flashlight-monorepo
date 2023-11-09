@@ -19,6 +19,7 @@ const App = () => {
   if (mode === ConnectionMode.HOST && !hosted) {
     return <HostScreen />;
   }
+
   return <Game />;
 };
 export default App;

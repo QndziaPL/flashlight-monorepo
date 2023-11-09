@@ -1,11 +1,12 @@
 import { FC, useState } from "react";
 import styles from "./LobbyList.module.scss";
 import { Lobby } from "../../../../../shared/types/lobby.ts";
-import RTC from "../../../RTC/RTC.ts";
-import webRTCClient from "../../../RTC/RTC.ts";
-import { useSocketContext } from "../../../context/SocketContext.tsx";
+
+import { webRTCClient } from "../../../RTC/RTC.ts";
 import { formatTimestamp } from "./helpers.ts";
 import { RTCEventType } from "../../../../../shared/types/rtc.ts";
+import { socket } from "../../../socket/Socket.ts";
+import { ConnectionMode, useAppContext } from "../../../context/AppContext.tsx";
 
 export type LobbyListProps = {
   lobbys: Lobby[];
@@ -13,10 +14,10 @@ export type LobbyListProps = {
   refreshLobby: () => Promise<void>;
 };
 export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobby }) => {
-  const { joinRoom } = useSocketContext();
+  const { setMode } = useAppContext();
   const handleJoinLobby = async (lobbyId: Lobby["id"], offer?: RTCSessionDescriptionInit) => {
-    const answer = await RTC.createAnswer(offer);
-    joinRoom(lobbyId, answer);
+    const answer = await webRTCClient.createAnswer(offer);
+    socket.joinRoom(lobbyId, answer);
   };
 
   const [testInputValue, setTestInputValue] = useState("");
@@ -26,6 +27,7 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
       <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>
         active lobbys <button onClick={refreshLobby}>refresh</button>
       </h1>
+      <button onClick={() => setMode(ConnectionMode.HOST)}>host screen</button>
       <div className={styles.lobbyList}>
         <div className={styles.listHeader}>
           <div>ID</div>

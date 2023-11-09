@@ -1,6 +1,6 @@
-import { socket } from "../context/SocketContext.tsx";
 import { WSEvent } from "../../../shared/types/websocket.ts";
 import { RTCEventType } from "../../../shared/types/rtc.ts";
+import { socket } from "../socket/Socket.ts";
 
 class WebRTCClient {
   configuration: RTCConfiguration;
@@ -14,21 +14,19 @@ class WebRTCClient {
     this.connection.onicecandidate = (event) => {
       console.log("ON_ICE_CANDIDATE_EVENT");
       if (event.candidate) {
-        console.log("ON_ICE_CANDIDATE_EVENT - sending ICE CANDIDATE");
+        console.log(`ON_ICE_CANDIDATE_EVENT - sending ICE CANDIDATE, candidate: ${JSON.stringify(event.candidate)}`);
         // Send the ICE candidate to the other peer using your signaling channel
         // Example: socket.emit("ice-candidate", event.candidate);
         socket.emit(WSEvent.ICE_CANDIDATE, event.candidate);
       }
     };
 
-    this.connection.onnegotiationneeded;
+    // this.connection.onnegotiationneeded;
 
     this.connection.oniceconnectionstatechange = (event) => {
-      console.log("oniceconnectionstatechange", event);
-    };
-
-    this.connection.oniceconnectionstatechange = (event) => {
-      console.log("ICE connection state:", this.connection.iceConnectionState);
+      console.log(
+        `ON ICE CONNECTION STATE CHANGE. state: ${this.connection.iceConnectionState}, event: ${JSON.stringify(event)}`,
+      );
       if (this.connection.iceConnectionState === "connected") {
         console.log("MAMY KURWA POŁĄCZENIE!!!!!!!!!!!!!!!!!!!!!");
       }
@@ -86,10 +84,18 @@ class WebRTCClient {
 
   async createAnswer(offer?: RTCSessionDescriptionInit) {
     if (!offer) throw new Error("No offer");
-    await this.connection.setRemoteDescription(offer);
-    const answer = await this.connection.createAnswer();
-    await this.connection.setLocalDescription(answer);
-    return this.connection.localDescription ?? undefined;
+    try {
+      await this.connection.setRemoteDescription(offer);
+      const answer = await this.connection.createAnswer();
+      await this.connection.setLocalDescription(answer);
+      const answerFromLocalDescription = this.connection.localDescription;
+      if (!answerFromLocalDescription) {
+        throw Error(`Answer from localDescription not obtained`);
+      }
+      return answerFromLocalDescription;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async setRemoteDescriptionAndHandleICE(remoteDescription: RTCSessionDescriptionInit) {
@@ -101,6 +107,7 @@ class WebRTCClient {
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit) {
+    console.log("ICE CANDIDATE");
     await this.connection.addIceCandidate(candidate);
   }
 
@@ -112,6 +119,4 @@ class WebRTCClient {
 const rtcConfiguration: RTCConfiguration = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
 };
-const webRTCClient = new WebRTCClient(rtcConfiguration);
-
-export default webRTCClient;
+export const webRTCClient = new WebRTCClient(rtcConfiguration);

@@ -1,22 +1,22 @@
 import { FC, useState } from "react";
 import { useIpAddress } from "../../hooks/useIpAddress.ts";
 import { ConnectionMode, useAppContext } from "../../context/AppContext.tsx";
-import RTC from "../../RTC/RTC.ts";
 import { FECreateLobbyProps } from "../../../../shared/types/lobby.ts";
-import { useSocketContext } from "../../context/SocketContext.tsx";
 import { useApi } from "../../hooks/useApi.ts";
+import { webRTCClient } from "../../RTC/RTC.ts";
+import { socket } from "../../socket/Socket.ts";
 
 export type HostScreenProps = {};
 export const HostScreen: FC<HostScreenProps> = () => {
   const { ip, error, loading } = useIpAddress();
   const { setMode, clientId } = useAppContext();
-  const { socket, joinRoom } = useSocketContext();
+
   const [lobbyName, setLobbyName] = useState<string>("");
 
   const createLobbyAPI = useApi<{ lobbyId: string }>();
 
   const handleCreateLobby = async () => {
-    const offer = await RTC.createOffer();
+    const offer = await webRTCClient.createOffer();
     const createLobbyData: FECreateLobbyProps = {
       name: lobbyName,
       hostId: clientId,
@@ -28,7 +28,7 @@ export const HostScreen: FC<HostScreenProps> = () => {
     const data = await createLobbyAPI.call("/lobbys", { method: "POST", body: JSON.stringify(createLobbyData) });
 
     if (data.lobbyId) {
-      joinRoom(data.lobbyId);
+      socket.joinRoom(data.lobbyId);
       setMode(ConnectionMode.JOIN);
     }
   };

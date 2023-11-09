@@ -8,16 +8,16 @@ import { updateProjectiles } from "./helpers/updateProjectiles.ts";
 import Environment from "../Environment/Environment.ts";
 import { checkProjectileCollisions } from "./helpers/checkProjectileCollisions.ts";
 import { shoot } from "./helpers/shoot.ts";
-import { Socket } from "socket.io-client";
+import { SocketClient } from "../../socket/Socket.ts";
 
 export type GameStateConstructorProps = {
   canvasRef: HTMLCanvasElement;
   playerInput: PlayerInput;
-  socket: Socket;
+  socket: SocketClient;
 };
 
 export default class GameState {
-  #socket: Socket;
+  #socket: SocketClient;
   // rendering
   #canvas: HTMLCanvasElement;
   #ctx: CanvasRenderingContext2D;
