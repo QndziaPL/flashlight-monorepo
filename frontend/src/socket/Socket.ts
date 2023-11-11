@@ -12,8 +12,9 @@ export class SocketClient {
     this.socket.on("connect", () => {
       console.log("front podłączony");
     });
-    this.socket.on(WSEvent.INFO_MESSAGE, console.log);
+    this.socket.on(WSEvent.INFO_MESSAGE, (msg) => console.log(msg));
     this.socket.on(WSEvent.RTC_ANSWER, async (RTCAnswer) => {
+      console.log("SIEMA KURWA ENIU", JSON.stringify(RTCAnswer));
       try {
         const isWaitingForAnswer = webRTCClient.signalingState === "have-local-offer";
         console.log(`Received RTC answer. Signaling state: ${webRTCClient.signalingState}`);

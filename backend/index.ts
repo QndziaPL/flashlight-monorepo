@@ -36,8 +36,8 @@ io.on("connection", (socket) => {
         socket.emit("afterShoot", `zakurwiłeś pizdo na ${msg.x}x${msg.y}`);
     });
 
-    socket.on(WSEvent.JOIN_ROOM, ({clientId, roomName, RTCAnswer}) => {
-        socket.join(roomName)
+    socket.on(WSEvent.JOIN_ROOM, async ({clientId, roomName, RTCAnswer}) => {
+        await socket.join(roomName)
         const infoMessage = `Client with id: ${clientId} joined "${roomName}" room`
         socket.to(roomName).emit(WSEvent.INFO_MESSAGE, infoMessage)
         if (RTCAnswer) {
