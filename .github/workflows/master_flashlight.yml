@@ -76,10 +76,3 @@ jobs:
           app-name: 'flashlight'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_541F0484D3E744BC99AD55B2B93DE50D }}
-
-#      - name: Run npm start on Azure Web App
-#        run: node dist/index.js
-#        working-directory: backend/dist
-
-
-

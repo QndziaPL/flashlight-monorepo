@@ -57,4 +57,6 @@ export class SocketClient {
   }
 }
 
-export const socket = new SocketClient("http://localhost");
+const BACKEND_URL = import.meta.env.VITE_API_URL ?? "http://localhost";
+export const socket = new SocketClient(BACKEND_URL);
+// export const socket = new SocketClient("http://localhost");

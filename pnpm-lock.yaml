@@ -57,6 +57,9 @@ importers:
 
   frontend:
     dependencies:
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
       peer:
         specifier: ^1.0.1
         version: 1.0.1

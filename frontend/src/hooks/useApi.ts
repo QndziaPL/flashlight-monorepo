@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 
-const BACKEND_CORE_URL = "http://localhost/api";
+const BACKEND_URL = import.meta.env.VITE_API_URL ?? "http://localhost";
+const BACKEND_CORE_URL = `${BACKEND_URL}/api`;
 
 export const useApi = <T>(initialState?: T) => {
   const [data, setData] = useState<T | undefined>(initialState);
