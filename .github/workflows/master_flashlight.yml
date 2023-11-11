@@ -78,8 +78,13 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_541F0484D3E744BC99AD55B2B93DE50D }}
 
       - name: Run npm start on Azure Web App
-        run: |
-          npm install pm2 -g
-          pm2 start dist/index.js
-          sudo pm2 list
+        run: node dist/index.js
         working-directory: backend
+          #      - name: Run npm start on Azure Web App
+          #        run: |
+          #          npm install pm2 -g
+          #          pm2 start dist/index.js
+          #          sudo pm2 list
+        #        working-directory: backend
+
+
