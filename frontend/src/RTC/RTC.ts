@@ -4,14 +4,29 @@ import { socket } from "../socket/Socket.ts";
 import { PlayerChat, PlayerChatMessage } from "./PlayerChat.ts";
 import { v4 as uuid } from "uuid";
 
+export type SubscriberCallback<T> = (data: T) => void;
+export type Subscribers<T> = Map<SubscriberCallback<T>, SubscriberCallback<T>>;
+export type RTCSubscribers = {
+  chat: Subscribers<PlayerChatMessage[]>;
+  iceConnectionState: Subscribers<RTCIceConnectionState>;
+};
+
+type ExtractSubscribersType<T> = T extends Subscribers<infer U> ? U : never;
+
+export const initialSubscribers: RTCSubscribers = {
+  chat: new Map<SubscriberCallback<PlayerChatMessage[]>, SubscriberCallback<PlayerChatMessage[]>>(),
+  iceConnectionState: new Map<SubscriberCallback<RTCIceConnectionState>, SubscriberCallback<RTCIceConnectionState>>(),
+};
+
 class WebRTCClient {
   configuration: RTCConfiguration;
   connection: RTCPeerConnection;
   dataChannel: RTCDataChannel | null = null;
   playerChat: PlayerChat;
-  subscribersForChatMessages: ((chatMessages: PlayerChatMessage[]) => void)[] = [];
+  subscribers: RTCSubscribers;
 
   constructor(config: RTCConfiguration) {
+    this.subscribers = initialSubscribers;
     this.playerChat = new PlayerChat();
     this.configuration = config;
     this.connection = new RTCPeerConnection(this.configuration);
@@ -39,6 +54,10 @@ class WebRTCClient {
     };
   }
 
+  get iceConnectionState(): RTCIceConnectionState {
+    return this.connection.iceConnectionState;
+  }
+
   applyDataChannelSubscription(channel: RTCDataChannel) {
     channel.onopen = () => {
       console.log("CHANNEL OPENED ON JOINER");
@@ -57,14 +76,20 @@ class WebRTCClient {
   }
 
   notifySubscribedUI() {
-    this.subscribersForChatMessages.forEach((callback) => callback(this.playerChat.messages));
+    this.subscribers.chat.forEach((callback) => callback(this.playerChat.messages));
   }
 
-  subscribeForChatMessages(callback: (chatMessages: PlayerChatMessage[]) => void) {
-    this.subscribersForChatMessages.push(callback);
+  subscribe<T extends keyof RTCSubscribers>(
+    event: T,
+    callback: SubscriberCallback<ExtractSubscribersType<RTCSubscribers[T]>>,
+  ) {
+    this.subscribers[event].set(callback as any, callback as any);
   }
 
   storePlayerChatMessage(message: string) {
+    this.subscribe("iceConnectionState", (messages) => {
+      console.log(messages);
+    });
     this.playerChat.addMessage({
       id: uuid(),
       message: message,
@@ -81,6 +106,7 @@ class WebRTCClient {
     }
     this.dataChannel?.send(JSON.stringify(data));
     this.notifySubscribedUI();
+    console.log(this.connection.iceConnectionState);
   }
 
   async createOffer() {

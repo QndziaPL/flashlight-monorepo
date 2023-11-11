@@ -28,7 +28,8 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
   const handleOnRTCChatMessage = useCallback((chatMessages: PlayerChatMessage[]) => setChatMessages(chatMessages), []);
 
   useEffect(() => {
-    webRTCClient.subscribeForChatMessages(handleOnRTCChatMessage);
+    webRTCClient.subscribe("chat", handleOnRTCChatMessage);
+    // webRTCClient.subscribeForChatMessages(handleOnRTCChatMessage);
   }, []);
 
   return (
