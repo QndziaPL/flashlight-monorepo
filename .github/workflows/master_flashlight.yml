@@ -47,12 +47,14 @@ jobs:
 
       - name: Zip size
         run: stat -c%s release.zip
+        working-directory: backend/dist
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: node-app
           path: release.zip
+          working-directory: backend/dist
 
   deploy:
     runs-on: ubuntu-latest
