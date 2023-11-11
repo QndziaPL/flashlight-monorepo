@@ -1,3 +1,4 @@
 export enum RTCEventType {
-    "INFO" = "INFO"
+    INFO = "INFO",
+    CHAT = "CHAT"
 }

@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import styles from "./LobbyList.module.scss";
 import { Lobby } from "../../../../../shared/types/lobby.ts";
 
@@ -7,6 +7,7 @@ import { formatTimestamp } from "./helpers.ts";
 import { RTCEventType } from "../../../../../shared/types/rtc.ts";
 import { socket } from "../../../socket/Socket.ts";
 import { ConnectionMode, useAppContext } from "../../../context/AppContext.tsx";
+import { PlayerChatMessage } from "../../../RTC/PlayerChat.ts";
 
 export type LobbyListProps = {
   lobbys: Lobby[];
@@ -20,7 +21,15 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
     socket.joinRoom(lobbyId, answer);
   };
 
+  const [chatMessages, setChatMessages] = useState<PlayerChatMessage[]>([]);
+
   const [testInputValue, setTestInputValue] = useState("");
+
+  const handleOnRTCChatMessage = useCallback((chatMessages: PlayerChatMessage[]) => setChatMessages(chatMessages), []);
+
+  useEffect(() => {
+    webRTCClient.subscribeForChatMessages(handleOnRTCChatMessage);
+  }, []);
 
   return (
     <>
@@ -58,9 +67,14 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
         ))}
         <div style={{ margin: 20 }}>
           <input type="text" value={testInputValue} onChange={(e) => setTestInputValue(e.target.value)} />
-          <button onClick={() => webRTCClient.sendMessage(RTCEventType.INFO, testInputValue)}>
+          <button onClick={() => webRTCClient.sendMessage(RTCEventType.CHAT, testInputValue)}>
             SEND MESSAGE VIA WEBRTC
           </button>
+          <ul>
+            {chatMessages.map((message) => (
+              <li key={message.id}>{message.message}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </>
