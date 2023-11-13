@@ -41,6 +41,7 @@ export class SocketClient {
 
   joinRoom(roomName: string, RTCAnswer?: RTCSessionDescriptionInit): void {
     if (this.clientId) {
+      console.log(`RTCAnswer in Socket.joinRoom: ${JSON.stringify(RTCAnswer)}`);
       this.socket.emit(WSEvent.JOIN_ROOM, { clientId: this.clientId, roomName, RTCAnswer });
     }
   }
