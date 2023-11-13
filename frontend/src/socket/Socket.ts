@@ -30,7 +30,9 @@ export class SocketClient {
       try {
         await webRTCClient.addIceCandidate(candidate);
       } catch (error) {
-        console.error(`Error adding ICE candidate. candidate: ${JSON.stringify(candidate)}`);
+        console.error(
+          `Error adding ICE candidate. candidate: ${JSON.stringify(candidate)}. Error: ${JSON.stringify(error)}`,
+        );
       }
     });
 
