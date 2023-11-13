@@ -13,6 +13,12 @@ export type RTCSubscribers = {
 
 type ExtractSubscribersType<T> = T extends Subscribers<infer U> ? U : never;
 
+type CallbackForSubscribeMethod<TypeOfSubscription extends keyof RTCSubscribers> = SubscriberCallback<
+  ExtractSubscribersType<RTCSubscribers[TypeOfSubscription]>
+>;
+
+type SubscribeCallbackDataType<Callback> = Callback extends SubscriberCallback<infer Data> ? Data : never;
+
 export const initialSubscribers: RTCSubscribers = {
   chat: new Map<SubscriberCallback<PlayerChatMessage[]>, SubscriberCallback<PlayerChatMessage[]>>(),
   iceConnectionState: new Map<SubscriberCallback<RTCIceConnectionState>, SubscriberCallback<RTCIceConnectionState>>(),
@@ -43,6 +49,7 @@ class WebRTCClient {
       console.log(
         `ON ICE CONNECTION STATE CHANGE. state: ${this.connection.iceConnectionState}, event: ${JSON.stringify(event)}`,
       );
+      this.notify("iceConnectionState", this.connection.iceConnectionState);
       if (this.connection.iceConnectionState === "connected") {
         console.log("MAMY KURWA POŁĄCZENIE!!!!!!!!!!!!!!!!!!!!!");
       }
@@ -69,22 +76,23 @@ class WebRTCClient {
       if (data.eventType === RTCEventType.CHAT) {
         this.storePlayerChatMessage(data.message);
       }
-      this.notifySubscribedUI();
+      this.notify("chat", this.playerChat.messages);
     };
 
     this.dataChannel = channel;
   }
 
-  notifySubscribedUI() {
-    this.subscribers.chat.forEach((callback) => callback(this.playerChat.messages));
+  notify<T extends keyof RTCSubscribers>(eventType: T, data: SubscribeCallbackDataType<CallbackForSubscribeMethod<T>>) {
+    this.subscribers[eventType].forEach((callback) => callback(data as any));
   }
 
-  subscribe<T extends keyof RTCSubscribers>(
-    event: T,
-    callback: SubscriberCallback<ExtractSubscribersType<RTCSubscribers[T]>>,
-  ) {
+  subscribe<T extends keyof RTCSubscribers>(event: T, callback: CallbackForSubscribeMethod<T>) {
     this.subscribers[event].set(callback as any, callback as any);
   }
+
+  // unsubscribe<T extends keyof RTCSubscribers>(callback: () => void) {
+  //   this.subscribers["chat"].delete(callback);
+  // }
 
   storePlayerChatMessage(message: string) {
     this.subscribe("iceConnectionState", (messages) => {
@@ -105,7 +113,7 @@ class WebRTCClient {
       console.log(this.playerChat.messages);
     }
     this.dataChannel?.send(JSON.stringify(data));
-    this.notifySubscribedUI();
+    this.notify("chat", this.playerChat.messages);
     console.log(this.connection.iceConnectionState);
   }
 
@@ -114,7 +122,8 @@ class WebRTCClient {
       const dataChannel = this.connection.createDataChannel("TestDataChannel");
       this.applyDataChannelSubscription(dataChannel);
 
-      await this.connection.setLocalDescription();
+      const offer = await this.connection.createOffer();
+      await this.connection.setLocalDescription(offer);
       const description = this.connection.localDescription;
 
       if (!description) throw Error("No description during creating offer");

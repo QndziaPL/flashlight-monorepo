@@ -8,6 +8,7 @@ import { RTCEventType } from "../../../../../shared/types/rtc.ts";
 import { socket } from "../../../socket/Socket.ts";
 import { ConnectionMode, useAppContext } from "../../../context/AppContext.tsx";
 import { PlayerChatMessage } from "../../../RTC/PlayerChat.ts";
+import { ConnectionStateIndicator } from "../../../components/ConnectionStateIndicator/ConnectionStateIndicator.tsx";
 
 export type LobbyListProps = {
   lobbys: Lobby[];
@@ -22,14 +23,14 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
   };
 
   const [chatMessages, setChatMessages] = useState<PlayerChatMessage[]>([]);
-
+  const [iceConnectionState, setIceConnectionState] = useState<RTCIceConnectionState>("disconnected");
   const [testInputValue, setTestInputValue] = useState("");
 
-  const handleOnRTCChatMessage = useCallback((chatMessages: PlayerChatMessage[]) => setChatMessages(chatMessages), []);
-
+  const handleOnRTCChatMessage = useCallback(setChatMessages, []);
+  const handleOnIceConnectionState = useCallback(setIceConnectionState, []);
   useEffect(() => {
     webRTCClient.subscribe("chat", handleOnRTCChatMessage);
-    // webRTCClient.subscribeForChatMessages(handleOnRTCChatMessage);
+    webRTCClient.subscribe("iceConnectionState", handleOnIceConnectionState);
   }, []);
 
   return (
@@ -39,6 +40,7 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
       </h1>
       <button onClick={() => setMode(ConnectionMode.HOST)}>host screen</button>
       <div className={styles.lobbyList}>
+        <ConnectionStateIndicator state={iceConnectionState} />
         <div className={styles.listHeader}>
           <div>ID</div>
           <div>NAME</div>
