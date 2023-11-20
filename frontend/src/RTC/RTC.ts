@@ -90,14 +90,11 @@ class WebRTCClient {
     this.subscribers[event].set(callback as any, callback as any);
   }
 
-  // unsubscribe<T extends keyof RTCSubscribers>(callback: () => void) {
-  //   this.subscribers["chat"].delete(callback);
-  // }
+  unsubscribe<T extends keyof RTCSubscribers>(event: T, callback: CallbackForSubscribeMethod<T>) {
+    this.subscribers[event].delete(callback as any);
+  }
 
   storePlayerChatMessage(message: string) {
-    this.subscribe("iceConnectionState", (messages) => {
-      console.log(messages);
-    });
     this.playerChat.addMessage({
       id: uuid(),
       message: message,
