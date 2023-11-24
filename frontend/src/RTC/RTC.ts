@@ -135,6 +135,7 @@ class WebRTCClient {
     if (!offer) throw new Error("No offer");
     try {
       await this.connection.setRemoteDescription(offer);
+      //TODO: sprawdz kurwa czy nie trzeba przesłąć offer do createAnswer
       const answer = await this.connection.createAnswer();
       await this.connection.setLocalDescription(answer);
       const answerFromLocalDescription = this.connection.localDescription;

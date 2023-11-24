@@ -18,7 +18,7 @@ export class SocketClient {
       try {
         const isWaitingForAnswer = webRTCClient.signalingState === "have-local-offer";
         console.log(`Received RTC answer. Signaling state: ${webRTCClient.signalingState}`);
-        if (isWaitingForAnswer) {
+        if (true || isWaitingForAnswer) {
           await webRTCClient.setRemoteDescriptionAndHandleICE(RTCAnswer);
         }
       } catch (error) {
