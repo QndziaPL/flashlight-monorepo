@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, FormEvent, useCallback, useEffect, useState } from "react";
 import styles from "./LobbyList.module.scss";
 import { Lobby } from "../../../../../shared/types/lobby.ts";
 
@@ -23,7 +23,7 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
   };
 
   const [chatMessages, setChatMessages] = useState<PlayerChatMessage[]>([]);
-  const [iceConnectionState, setIceConnectionState] = useState<RTCIceConnectionState>("disconnected");
+  const [iceConnectionState, setIceConnectionState] = useState<RTCIceConnectionState>(webRTCClient.iceConnectionState);
   const [testInputValue, setTestInputValue] = useState("");
 
   const handleOnRTCChatMessage = useCallback(setChatMessages, []);
@@ -32,6 +32,11 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
     webRTCClient.subscribe("chat", handleOnRTCChatMessage);
     webRTCClient.subscribe("iceConnectionState", handleOnIceConnectionState);
   }, []);
+
+  const handleSubmitTextMessage = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    webRTCClient.sendMessage(RTCEventType.CHAT, testInputValue);
+  };
 
   return (
     <>
@@ -68,17 +73,15 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
             </div>
           </div>
         ))}
-        <div style={{ margin: 20 }}>
+        <form style={{ margin: 20 }} onSubmit={handleSubmitTextMessage}>
           <input type="text" value={testInputValue} onChange={(e) => setTestInputValue(e.target.value)} />
-          <button onClick={() => webRTCClient.sendMessage(RTCEventType.CHAT, testInputValue)}>
-            SEND MESSAGE VIA WEBRTC
-          </button>
+          <button type="submit">SEND MESSAGE VIA WEBRTC</button>
           <ul>
             {chatMessages.map((message) => (
               <li key={message.id}>{message.message}</li>
             ))}
           </ul>
-        </div>
+        </form>
       </div>
     </>
   );
