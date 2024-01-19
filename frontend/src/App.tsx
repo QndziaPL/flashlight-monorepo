@@ -1,5 +1,4 @@
 import "./App.css";
-import { Game } from "./components/Game.tsx";
 import { ConnectionMode, useAppContext } from "./context/AppContext.tsx";
 import { ChooseModeScreen } from "./screens/ChooseModeScreen.tsx";
 import { JoinScreen } from "./screens/JoinScreen/JoinScreen.tsx";
@@ -7,6 +6,7 @@ import { HostScreen } from "./screens/HostScreen/HostScreen.tsx";
 
 const App = () => {
   const { mode, hosted } = useAppContext();
+  console.log("leci");
 
   if (mode === ConnectionMode.NOT_SELECTED) {
     return <ChooseModeScreen />;
@@ -15,11 +15,13 @@ const App = () => {
   if (mode === ConnectionMode.JOIN) {
     return <JoinScreen />;
   }
-
+  console.log(mode, hosted);
   if (mode === ConnectionMode.HOST && !hosted) {
     return <HostScreen />;
   }
 
-  return <Game />;
+  return "FUCKUP";
+
+  // return <Game />;
 };
 export default App;

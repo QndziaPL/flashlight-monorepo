@@ -38,6 +38,9 @@ importers:
       socket.io:
         specifier: ^4.7.2
         version: 4.7.2
+      uuid:
+        specifier: ^9.0.1
+        version: 9.0.1
     devDependencies:
       '@types/cors':
         specifier: ^2.8.14
@@ -45,6 +48,9 @@ importers:
       '@types/express':
         specifier: ^4.17.19
         version: 4.17.19
+      '@types/uuid':
+        specifier: ^9.0.5
+        version: 9.0.5
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.8.6)(typescript@5.2.2)

@@ -1,51 +1,36 @@
-import { FC, FormEvent, useCallback, useEffect, useState } from "react";
+import { FC } from "react";
 import styles from "./LobbyList.module.scss";
-import { Lobby } from "../../../../../shared/types/lobby.ts";
+import { ILobby } from "../../../../../shared/types/lobby.ts";
 
-import { webRTCClient } from "../../../RTC/RTC.ts";
 import { formatTimestamp } from "./helpers.ts";
-import { RTCEventType } from "../../../../../shared/types/rtc.ts";
-import { socket } from "../../../socket/Socket.ts";
 import { ConnectionMode, useAppContext } from "../../../context/AppContext.tsx";
-import { PlayerChatMessage } from "../../../RTC/PlayerChat.ts";
 import { ConnectionStateIndicator } from "../../../components/ConnectionStateIndicator/ConnectionStateIndicator.tsx";
+import { useSocket, useSocketSubscription } from "../../../hooks/useSocket.tsx";
 
-export type LobbyListProps = {
-  lobbys: Lobby[];
-  deleteLobby: (lobbyId: Lobby["id"]) => Promise<void>;
-  refreshLobby: () => Promise<void>;
-};
-export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobby }) => {
+export const LobbyList: FC = () => {
   const { setMode } = useAppContext();
-  const handleJoinLobby = async (lobbyId: Lobby["id"], offer?: RTCSessionDescriptionInit) => {
-    const answer = await webRTCClient.createAnswer(offer);
-    socket.joinRoom(lobbyId, answer);
+  const socket = useSocket();
+  const [lobbys] = useSocketSubscription<"LOBBY_LIST", "GET_LOBBY_LIST">({
+    eventName: "LOBBY_LIST",
+    autoFireEvent: { eventName: "GET_LOBBY_LIST", data: undefined },
+  });
+
+  console.log(lobbys);
+  const handleJoinLobby = async (lobbyId: ILobby["id"]) => {
+    socket.joinRoom(lobbyId);
   };
 
-  const [chatMessages, setChatMessages] = useState<PlayerChatMessage[]>([]);
-  const [iceConnectionState, setIceConnectionState] = useState<RTCIceConnectionState>(webRTCClient.iceConnectionState);
-  const [testInputValue, setTestInputValue] = useState("");
-
-  const handleOnRTCChatMessage = useCallback(setChatMessages, []);
-  const handleOnIceConnectionState = useCallback(setIceConnectionState, []);
-  useEffect(() => {
-    webRTCClient.subscribe("chat", handleOnRTCChatMessage);
-    webRTCClient.subscribe("iceConnectionState", handleOnIceConnectionState);
-  }, []);
-
-  const handleSubmitTextMessage = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    webRTCClient.sendMessage(RTCEventType.CHAT, testInputValue);
-  };
+  // const handleSubmitTextMessage = (e: FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   webRTCClient.sendMessage(RTCEventType.CHAT, testInputValue);
+  // };
 
   return (
     <>
-      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>
-        active lobbys <button onClick={refreshLobby}>refresh</button>
-      </h1>
+      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>active lobbys</h1>
       <button onClick={() => setMode(ConnectionMode.HOST)}>host screen</button>
       <div className={styles.lobbyList}>
-        <ConnectionStateIndicator state={iceConnectionState} />
+        <ConnectionStateIndicator state={WebSocket.CLOSED} />
         <div className={styles.listHeader}>
           <div>ID</div>
           <div>NAME</div>
@@ -54,7 +39,7 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
           <div>PLAYERS</div>
           <div>actions</div>
         </div>
-        {lobbys.map((lobby) => (
+        {lobbys?.map((lobby) => (
           <div key={lobby.id} className={styles.singleLobby}>
             <div>{lobby.id}</div>
             <div>{lobby.name}</div>
@@ -68,20 +53,11 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
               </ol>
             </div>
             <div>
-              <button onClick={() => handleJoinLobby(lobby.id, lobby.webrtc.offer)}>JOIN</button>
-              <button onClick={() => deleteLobby(lobby.id)}>DELETE</button>
+              {/*<button onClick={() => handleJoinLobby(lobby.id)}>JOIN</button>*/}
+              {/*<button onClick={() => deleteLobby(lobby.id)}>DELETE</button>*/}
             </div>
           </div>
         ))}
-        <form style={{ margin: 20 }} onSubmit={handleSubmitTextMessage}>
-          <input type="text" value={testInputValue} onChange={(e) => setTestInputValue(e.target.value)} />
-          <button type="submit">SEND MESSAGE VIA WEBRTC</button>
-          <ul>
-            {chatMessages.map((message) => (
-              <li key={message.id}>{message.message}</li>
-            ))}
-          </ul>
-        </form>
       </div>
     </>
   );

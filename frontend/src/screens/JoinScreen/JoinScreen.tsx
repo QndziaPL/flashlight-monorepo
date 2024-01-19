@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { ConnectionMode, useAppContext } from "../../context/AppContext.tsx";
 import { LobbyList } from "./LobbyList/LobbyList.tsx";
-import { Lobby } from "../../../../shared/types/lobby.ts";
+import { ILobby } from "../../../../shared/types/lobby.ts";
 import { useApi } from "../../hooks/useApi.ts";
 
 export type JoinScreenProps = {};
@@ -17,14 +17,14 @@ export const JoinScreen: FC<JoinScreenProps> = () => {
     getLobbysAPI.call("/lobbys");
   }, []);
 
-  const getLobbysAPI = useApi<Lobby[]>([]);
+  const getLobbysAPI = useApi<ILobby[]>([]);
   const deleteLobbyAPI = useApi();
 
   const fetchLobbys = async () => {
     await getLobbysAPI.call("/lobbys");
   };
 
-  const handleDeleteLobby = async (lobbyId: Lobby["id"]) => {
+  const handleDeleteLobby = async (lobbyId: ILobby["id"]) => {
     await deleteLobbyAPI.call("/lobbys", { method: "DELETE", body: JSON.stringify({ lobbyId }) });
     fetchLobbys();
   };
@@ -34,7 +34,8 @@ export const JoinScreen: FC<JoinScreenProps> = () => {
       {getLobbysAPI.loading && <p>loading lobbys...</p>}
       <h1>join game</h1>
 
-      <LobbyList lobbys={getLobbysAPI.data ?? []} deleteLobby={handleDeleteLobby} refreshLobby={fetchLobbys} />
+      <LobbyList />
+      {/*<LobbyList lobbys={getLobbysAPI.data ?? []} deleteLobby={handleDeleteLobby} refreshLobby={fetchLobbys} />*/}
       <hr />
       <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} />
       <button disabled={!validAddress}>join</button>

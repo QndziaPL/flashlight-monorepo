@@ -48,9 +48,9 @@ export default class GameState {
 
   constructor({ canvasRef, playerInput, socket }: GameStateConstructorProps) {
     this.#socket = socket;
-    this.#socket.on("afterShoot", (args) => {
-      console.log(args);
-    });
+    // this.#socket.on("afterShoot", (args) => {
+    //   console.log(args);
+    // });
     this.#canvas = canvasRef;
     const ctx = canvasRef.getContext("2d");
     if (!ctx) throw new Error("Couldn't get context2d from canvasRef");
@@ -111,7 +111,7 @@ export default class GameState {
 
     if (this.#playerInput.mouse.pressed) {
       shoot(this);
-      this.#socket.emit("playerShoot", this.#playerInput.mouse.position);
+      // this.#socket.emit("playerShoot", this.#playerInput.mouse.position);
     }
   }
 

@@ -1,7 +1,4 @@
-import { WSEvent } from "../../../shared/types/websocket.ts";
-import { RTCEventType } from "../../../shared/types/rtc.ts";
-import { socket } from "../socket/Socket.ts";
-import { PlayerChat, PlayerChatMessage } from "./PlayerChat.ts";
+// @ts-nocheck
 import { v4 as uuid } from "uuid";
 
 export type SubscriberCallback<T> = (data: T) => void;
@@ -36,14 +33,6 @@ class WebRTCClient {
     this.playerChat = new PlayerChat();
     this.configuration = config;
     this.connection = new RTCPeerConnection(this.configuration);
-
-    this.connection.onicecandidate = (event) => {
-      console.log("ON_ICE_CANDIDATE_EVENT");
-      if (event.candidate) {
-        console.log(`ON_ICE_CANDIDATE_EVENT - sending ICE CANDIDATE, candidate: ${JSON.stringify(event.candidate)}`);
-        socket.emit(WSEvent.ICE_CANDIDATE, event.candidate);
-      }
-    };
 
     this.connection.oniceconnectionstatechange = (event) => {
       console.log(
@@ -179,4 +168,4 @@ class WebRTCClient {
 const rtcConfiguration: RTCConfiguration = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
 };
-export const webRTCClient = new WebRTCClient(rtcConfiguration);
+// export const webRTCClient = new WebRTCClient(rtcConfiguration);
