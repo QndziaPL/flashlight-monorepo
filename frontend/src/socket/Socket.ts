@@ -32,7 +32,7 @@ export class SocketClient {
 
   joinRoom(roomName: string): void {
     if (this.clientId) {
-      this.socket.emit("JOIN_ROOM", { room: roomName, clientId: this.clientId });
+      this.socket.emit("JOIN_LOBBY", { room: roomName, clientId: this.clientId });
     }
   }
 

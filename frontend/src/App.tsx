@@ -6,7 +6,6 @@ import { HostScreen } from "./screens/HostScreen/HostScreen.tsx";
 
 const App = () => {
   const { mode, hosted } = useAppContext();
-  console.log("leci");
 
   if (mode === ConnectionMode.NOT_SELECTED) {
     return <ChooseModeScreen />;

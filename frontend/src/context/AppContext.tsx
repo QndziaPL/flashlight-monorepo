@@ -25,6 +25,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [hosted, setHosted] = useState(false);
 
   const [clientId] = useStorage("clientId", uuid(), "local");
+  // const []
 
   return <AppContext.Provider value={{ mode, setMode, hosted, setHosted, clientId }}>{children}</AppContext.Provider>;
 };

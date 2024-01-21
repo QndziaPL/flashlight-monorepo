@@ -35,7 +35,7 @@ type EventCallback<T> = (props: T) => void;
 
 export type EventsToServer = {
   CHAT_MESSAGE: EventCallback<IChatMessageClient>;
-  JOIN_ROOM: EventCallback<{ clientId: SocketClient["clientId"]; room: string }>;
+  JOIN_LOBBY: EventCallback<{ clientId: SocketClient["clientId"]; room: string }>;
   CREATE_LOBBY: EventCallback<FECreateLobbyProps>;
   GET_LOBBY_LIST: EventCallback<undefined>;
 } & SocketReservedEvents;

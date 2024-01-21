@@ -22,7 +22,7 @@ export class WebSocketClient {
       console.log(`Connected client with socketId: ${socket.id}`);
       socket.emit("LOBBY_LIST", this.lobbyService.lobbys);
 
-      socket.on("JOIN_ROOM", async ({ clientId, room }) => {
+      socket.on("JOIN_LOBBY", async ({ clientId, room }) => {
         await socket.join(room);
         const infoMessage = `Client with id: ${clientId} joined "${room}" room`;
         socket.to(room).emit("INFO_MESSAGE", infoMessage);
