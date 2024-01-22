@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from "react";
 import GameState from "../classes/GameState/GameState.ts";
 import PlayerInput from "../classes/PlayerInput/PlayerInput.ts";
-import { useSocket } from "../hooks/useSocket.tsx";
+import { useSocket } from "../context/WebSocketContext.tsx";
 
 export type GameProps = {};
 export const Game: FC<GameProps> = () => {

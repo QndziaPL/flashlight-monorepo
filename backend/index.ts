@@ -2,8 +2,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express, { Application, Request, Response } from "express";
 import http from "http";
-import lobbyRouter from "./router/lobbyRouter";
 import { WebSocketClient } from "./websocket/websocket";
+import { LobbyService } from "./services/LobbyService";
+import LobbyRouter from "./router/LobbyRouter";
 
 dotenv.config();
 
@@ -16,12 +17,14 @@ const server = http.createServer(app);
 
 const port = process.env.PORT ?? 80;
 
+const lobbyService = new LobbyService();
+const webSocketClient = new WebSocketClient(server, lobbyService);
+const lobbyRouter = new LobbyRouter(lobbyService, webSocketClient);
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Elo kurwy");
 });
 
-app.use("/api", lobbyRouter);
-
-const webSocketClient = new WebSocketClient(server);
+app.use("/api/lobbys", lobbyRouter.getRouter());
 
 server.listen(port, () => console.log(`Http napierdala na porcie: ${port}`));

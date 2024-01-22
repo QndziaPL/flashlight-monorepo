@@ -1,6 +1,6 @@
 import { createContext, FC, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { EmitFunctionProps, SocketClient } from "../socket/Socket.ts";
-import { useAppContext } from "../context/AppContext.tsx";
+import { useAppContext } from "./AppContext.tsx";
 import {
   DataFromEventCallback,
   EventsFromServer,
@@ -20,12 +20,14 @@ const BACKEND_URL = import.meta.env.VITE_API_URL ?? "http://localhost";
 export const WebSocketProvider: FC<WebSocketProviderProps> = ({ children }) => {
   const { clientId } = useAppContext();
   const socketRef = useRef<SocketClient | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     socketRef.current = new SocketClient(BACKEND_URL, clientId);
+    setInitialized(true);
   }, []);
 
-  return <WebSocketContext.Provider value={socketRef.current}>{children}</WebSocketContext.Provider>;
+  return <WebSocketContext.Provider value={socketRef.current}>{initialized && children}</WebSocketContext.Provider>;
 };
 
 export const useSocket = () => {

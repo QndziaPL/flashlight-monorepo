@@ -3,7 +3,7 @@ import { useIpAddress } from "../../hooks/useIpAddress.ts";
 import { ConnectionMode, useAppContext } from "../../context/AppContext.tsx";
 import { FECreateLobbyProps } from "../../../../shared/types/lobby.ts";
 import { useApi } from "../../hooks/useApi.ts";
-import { useSocket } from "../../hooks/useSocket.tsx";
+import { useSocket } from "../../context/WebSocketContext.tsx";
 
 export type HostScreenProps = {};
 export const HostScreen: FC<HostScreenProps> = () => {

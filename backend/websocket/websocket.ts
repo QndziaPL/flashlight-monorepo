@@ -6,10 +6,11 @@ import { ClientsService } from "../services/ClientsService";
 
 export class WebSocketClient {
   private io: Server<EventsToServer, EventsFromServer>;
-  private lobbyService: LobbyService = new LobbyService();
+  private lobbyService: LobbyService;
   private players: ClientsService = new ClientsService();
 
-  constructor(httpServer: http.Server) {
+  constructor(httpServer: http.Server, lobbyService: LobbyService) {
+    this.lobbyService = lobbyService;
     this.io = new Server<EventsToServer, EventsFromServer>(httpServer, {
       cors: { origin: "*" },
     });

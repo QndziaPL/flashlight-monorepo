@@ -5,19 +5,24 @@ import { ILobby } from "../../../../../shared/types/lobby.ts";
 import { formatTimestamp } from "./helpers.ts";
 import { ConnectionMode, useAppContext } from "../../../context/AppContext.tsx";
 import { ConnectionStateIndicator } from "../../../components/ConnectionStateIndicator/ConnectionStateIndicator.tsx";
-import { useSocket, useSocketSubscription } from "../../../hooks/useSocket.tsx";
+import { useSocket, useSocketSubscription } from "../../../context/WebSocketContext.tsx";
+import { useApi } from "../../../hooks/useApi.ts";
 
 export const LobbyList: FC = () => {
   const { setMode } = useAppContext();
   const socket = useSocket();
+
   const [lobbys] = useSocketSubscription<"LOBBY_LIST", "GET_LOBBY_LIST">({
     eventName: "LOBBY_LIST",
     autoFireEvent: { eventName: "GET_LOBBY_LIST", data: undefined },
   });
 
+  const lobbysApi = useApi();
+
   console.log(lobbys);
   const handleJoinLobby = async (lobbyId: ILobby["id"]) => {
-    socket.joinRoom(lobbyId);
+    lobbysApi.call("/lobbys/join", { method: "POST", body: JSON.stringify({ lobbyId }) });
+    // socket.joinRoom(lobbyId);
   };
 
   // const handleSubmitTextMessage = (e: FormEvent<HTMLFormElement>) => {
@@ -53,7 +58,7 @@ export const LobbyList: FC = () => {
               </ol>
             </div>
             <div>
-              {/*<button onClick={() => handleJoinLobby(lobby.id)}>JOIN</button>*/}
+              <button onClick={() => handleJoinLobby(lobby.id)}>JOIN</button>
               {/*<button onClick={() => deleteLobby(lobby.id)}>DELETE</button>*/}
             </div>
           </div>
