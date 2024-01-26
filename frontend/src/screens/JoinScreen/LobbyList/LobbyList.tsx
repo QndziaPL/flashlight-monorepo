@@ -9,6 +9,7 @@ import { useApi } from "../../../hooks/useApi.ts";
 import { ProtectedPaths } from "../../../Router/RouterPaths.ts";
 import { useNavigate } from "react-router";
 import { withBackslash } from "../../../Router/helpers.ts";
+import { Button } from "../../../components/Button.tsx";
 
 export const LobbyList: FC = () => {
   const navigate = useNavigate();
@@ -35,7 +36,9 @@ export const LobbyList: FC = () => {
   return (
     <>
       <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>active lobbys</h1>
-      <button onClick={() => navigate(withBackslash(ProtectedPaths.HOST))}>host screen</button>
+      <Button className="mb-2" onClick={() => navigate(withBackslash(ProtectedPaths.HOST))}>
+        Create lobby
+      </Button>
       <div className={styles.lobbyList}>
         <ConnectionStateIndicator state={WebSocket.CLOSED} />
         <div className={styles.listHeader}>

@@ -1,10 +1,9 @@
 import "./Navigation/Navigation.scss";
-import { Link } from "react-router-dom";
-import { withBackslash } from "../Router/helpers.ts";
 import { ProtectedPaths, PublicPaths } from "../Router/RouterPaths.ts";
 import { useAuth } from "../context/AuthContext.tsx";
 import kupa from "/kupa.png";
 import { FC } from "react";
+import { Button } from "./Button.tsx";
 
 export const Navigation = () => {
   const { user, logout } = useAuth();
@@ -22,16 +21,18 @@ type LoggedActionBarProps = {
 const LoggedActionBar: FC<LoggedActionBarProps> = ({ logout }) => (
   <>
     <li>
-      <Link to={withBackslash(PublicPaths.HOME)}>Home</Link>
+      <Button link={PublicPaths.HOME}>Home</Button>
     </li>
     <li>
-      <Link to={withBackslash(ProtectedPaths.HOST)}>Host</Link>
+      <Button link={ProtectedPaths.HOST}>Host</Button>
     </li>
     <li>
-      <Link to={withBackslash(ProtectedPaths.LOBBYS)}>Lobby List</Link>
+      <Button link={ProtectedPaths.LOBBYS}>Lobby List</Button>
     </li>
     <li>
-      <a onClick={logout}>Log out</a>
+      <Button variant="ghost" onClick={logout}>
+        Logout
+      </Button>
     </li>
   </>
 );
@@ -39,13 +40,13 @@ const LoggedActionBar: FC<LoggedActionBarProps> = ({ logout }) => (
 const NotLoggedActionBar = () => (
   <>
     <li>
-      <Link to={withBackslash(PublicPaths.HOME)}>Home</Link>
+      <Button link={PublicPaths.HOME}>Home</Button>
     </li>
     <li>
-      <Link to={withBackslash(PublicPaths.LOGIN)}>Login</Link>
+      <Button link={PublicPaths.LOGIN}>Login</Button>
     </li>
     <li>
-      <Link to={withBackslash(PublicPaths.REGISTER)}>Register</Link>
+      <Button link={PublicPaths.REGISTER}>Register</Button>
     </li>
   </>
 );

@@ -2,6 +2,9 @@ import { FormEvent, useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase.ts";
 import { useNavigate } from "react-router";
+import { Button } from "../../components/Button.tsx";
+import { Input } from "../../@/components/ui/input.tsx";
+import { Label } from "../../@/components/ui/label.tsx";
 
 export const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -35,18 +38,18 @@ export const RegisterScreen = () => {
   return (
     <form onSubmit={onSubmit}>
       <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Label htmlFor="email">Email</Label>
+        <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
 
       <div>
-        <label htmlFor="password">Password</label>
-        <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <Label htmlFor="password">Password</Label>
+        <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
 
       <div>
-        <label htmlFor="repeatedPassword">Repeat Password</label>
-        <input
+        <Label htmlFor="repeatedPassword">Repeat Password</Label>
+        <Input
           id="repeatedPassword"
           type="password"
           value={repeatedPassword}
@@ -57,7 +60,7 @@ export const RegisterScreen = () => {
 
       {error && <p>{error}</p>}
 
-      <button type="submit">Sign up</button>
+      <Button type="submit">Sign up</Button>
     </form>
   );
 };
