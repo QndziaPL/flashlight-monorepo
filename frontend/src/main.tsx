@@ -15,6 +15,7 @@ import { ProtectedPaths, PublicPaths } from "./Router/RouterPaths.ts";
 import { PublicLayout } from "./Router/RouterLayouts/PublicLayout.tsx";
 import { HostScreen } from "./screens/HostScreen/HostScreen.tsx";
 import { ToastContextProvider } from "./context/ToastContext.tsx";
+import { Navigate } from "react-router";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
         element: <HostScreen />,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <Navigate to={PublicPaths.HOME} replace />,
   },
 ]);
 
