@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --background: rgba(255, 255, 255, 1); /* HSL 0 0% 100% */
-    --foreground: rgba(101, 13, 14, 1); /* HSL 222.2 84% 4.9% */
+    --foreground: rgb(0, 8, 141); /* HSL 222.2 84% 4.9% */
 
     --card: rgba(255, 255, 255, 1); /* HSL 0 0% 100% */
     --card-foreground: rgba(101, 13, 14, 1); /* HSL 222.2 84% 4.9% */
@@ -13,10 +13,10 @@
     --popover: rgba(255, 255, 255, 1); /* HSL 0 0% 100% */
     --popover-foreground: rgba(101, 13, 14, 1); /* HSL 222.2 84% 4.9% */
 
-    --primary: rgb(0, 155, 255); /* HSL 222.2 47.4% 11.2% */
+    --primary: rgb(0, 78, 126); /* HSL 222.2 47.4% 11.2% */
     --primary-foreground: rgba(248, 252, 255, 1); /* HSL 210 40% 98% */
 
-    --secondary: rgba(246, 250, 255, 1); /* HSL 210 40% 96.1% */
+    --secondary: rgb(0, 159, 204); /* HSL 210 40% 96.1% */
     --secondary-foreground: rgba(143, 25, 34, 1); /* HSL 222.2 47.4% 11.2% */
 
     --muted: rgba(246, 250, 255, 1); /* HSL 210 40% 96.1% */
@@ -33,6 +33,8 @@
     --ring: rgba(101, 13, 14, 1); /* HSL 222.2 84% 4.9% */
 
     --radius: 0.5rem;
+
+    --nav-background: rgba(1, 1, 1, 1)
   }
 
   .dark {

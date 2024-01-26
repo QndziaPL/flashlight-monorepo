@@ -7,18 +7,24 @@ import {
   EventsToServerKeys,
 } from "../../../shared/types/websocket.ts";
 import { FECreateLobbyProps } from "../../../shared/types/lobby.ts";
+import { PingService } from "./PingService.ts";
 
 export type WebSocketSubscriber = {
   eventName: EventsFromServerKeys;
   callback: (...args: any[]) => void;
 };
 
+export type SocketClientCallbacks = {
+  pingCallback: (ping: number) => void;
+};
+
 export class SocketClient {
   private socket: Socket<EventsFromServer, EventsToServer>;
   private clientId: string;
   private subscribers: WebSocketSubscriber[] = [];
+  private pingService: PingService;
 
-  constructor(uri: string, clientId: string) {
+  constructor(uri: string, clientId: string, callbacks: SocketClientCallbacks) {
     this.socket = io(uri, {
       auth: {
         clientId,
@@ -33,6 +39,10 @@ export class SocketClient {
     this.socket.on("INFO_MESSAGE", async (msg) => {
       console.log(msg);
     });
+
+    this.socket.on("PONG", (data) => this.pingService.handlePong(data.pongId, callbacks.pingCallback));
+
+    this.pingService = new PingService(this);
   }
 
   joinLobby(lobbyId: string): void {
@@ -77,9 +87,18 @@ export class SocketClient {
     this.subscribers = this.subscribers.filter((subscriber) => subscriber.callback !== callback);
   }
 
-  disconnect() {
+  cleanup() {
+    this.pingService.cleanup();
     this.socket.disconnect();
     console.log(`Disconnecting ${this.clientId}`);
+  }
+
+  emitPing(pingId: string) {
+    this.socket.emit("PING", { pingId });
+  }
+
+  get ping() {
+    return this.pingService.ping;
   }
 }
 

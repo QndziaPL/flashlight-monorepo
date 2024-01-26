@@ -39,20 +39,36 @@ export type EventsToServer = {
   }>;
   CREATE_LOBBY: EventCallback<FECreateLobbyProps>;
   GET_LOBBY_LIST: EventCallback<undefined>;
+  PING: EventCallback<{
+    pingId: string;
+  }>;
 } & SocketReservedEvents;
 
 export type EventsToServerKeys = keyof EventsToServer;
 
 export type EventsFromServer = {
   CHAT_MESSAGE: EventCallback<IChatMessage>;
-  INFO_MESSAGE: EventCallback<string>;
+  INFO_MESSAGE: EventCallback<InfoMessage>;
   LOBBY_LIST: EventCallback<ILobby[]>;
   ERROR_MESSAGE: EventCallback<ErrorMesssage>;
+  PONG: EventCallback<{
+    pongId: string;
+  }>;
 } & SocketReservedEvents;
 
 export type EventsFromServerKeys = keyof EventsFromServer;
 
 export type DataFromEventCallback<Callback> = Callback extends EventCallback<infer Data> ? Data : never;
+
+export enum InfoMessageType {
+  GENERAL = "general",
+}
+
+export type InfoMessage = {
+  message: string;
+  type: InfoMessageType;
+  id: string;
+};
 
 export enum ErrorMessageType {
   GENERAL = "general",

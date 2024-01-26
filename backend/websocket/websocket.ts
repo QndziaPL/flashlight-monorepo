@@ -1,6 +1,6 @@
 import http from "http";
 import { Server } from "socket.io";
-import { ErrorMessageType, EventsFromServer, EventsToServer } from "../../shared/types/websocket";
+import { ErrorMessageType, EventsFromServer, EventsToServer, InfoMessageType } from "../../shared/types/websocket";
 import { LobbyService } from "../services/LobbyService";
 import { ClientsService } from "../services/ClientsService";
 import { v4 } from "uuid";
@@ -26,11 +26,11 @@ export class WebSocketClient {
       socket.emit("LOBBY_LIST", this.lobbyService.lobbys);
 
       socket.on("JOIN_LOBBY", async ({ lobbyId }) => {
-        await socket.join(lobbyId);
-        const infoMessage = `Client with id: ${clientId} joined "${lobbyId}" lobby and ws-room with same id`;
-        socket.to(lobbyId).emit("INFO_MESSAGE", infoMessage);
         try {
           this.lobbyService.joinLobby(lobbyId, clientId);
+          await socket.join(lobbyId);
+          const infoMessage = `Client with id: ${clientId} joined "${lobbyId}" lobby and ws-room with same id`;
+          socket.to(lobbyId).emit("INFO_MESSAGE", { type: InfoMessageType.GENERAL, message: infoMessage, id: v4() });
         } catch (error) {
           console.error(error);
           const errorMessage = error instanceof Error ? error.message : "An unknown error...";
@@ -40,9 +40,28 @@ export class WebSocketClient {
         this.io.emit("LOBBY_LIST", this.lobbyService.lobbys);
       });
 
-      socket.on("CREATE_LOBBY", (data) => {
-        this.lobbyService.createLobby({ ...data, clients: [clientId], createdAt: Date.now(), hostId: clientId });
-        this.io.emit("LOBBY_LIST", this.lobbyService.lobbys);
+      socket.on("PING", async (data) => {
+        // await delay(50);
+        socket.emit("PONG", { pongId: data.pingId });
+      });
+
+      socket.on("CREATE_LOBBY", async (data) => {
+        try {
+          const lobbyId = this.lobbyService.createLobby({
+            ...data,
+            clients: [clientId],
+            createdAt: Date.now(),
+            hostId: clientId,
+          });
+          await socket.join(lobbyId);
+          this.io.emit("LOBBY_LIST", this.lobbyService.lobbys);
+          const infoMessage = `You succesfully created lobby`;
+          socket.emit("INFO_MESSAGE", { type: InfoMessageType.GENERAL, message: infoMessage, id: v4() });
+        } catch (error) {
+          console.error(error);
+          const errorMessage = error instanceof Error ? error.message : "An unknown error...";
+          socket.emit("ERROR_MESSAGE", { type: ErrorMessageType.GENERAL, message: errorMessage, id: v4() });
+        }
       });
 
       socket.on("GET_LOBBY_LIST", () => {

@@ -1,29 +1,29 @@
-import { FC, ReactNode } from "react";
+import { forwardRef, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { withBackslash } from "../Router/helpers.ts";
 import { Button as BTN, ButtonProps as BTNProps } from "../@/components/ui/button.tsx";
-
-// type SpecificButtonTypeProps = ActionButtonProps | LinkButtonProps;
 
 type ButtonProps = {
   children: ReactNode;
   link?: string;
 } & BTNProps;
-// SpecificButtonTypeProps;
-export const Button: FC<ButtonProps> = (props) => {
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   if (props.link !== undefined) {
     return (
       <Link to={withBackslash(props.link)}>
-        <BTN {...props}>{props.children}</BTN>
+        <BTN ref={ref} {...props}>
+          {props.children}
+        </BTN>
       </Link>
     );
   }
 
-  return <BTN {...props}>{props.children}</BTN>;
-  // switch (props.link) {
-  //   case "link":
-  //
-  //   case "action":
-  //     return <BTN {...props}>{props.children}</BTN>;
-  // }
-};
+  return (
+    <BTN ref={ref} {...props}>
+      {props.children}
+    </BTN>
+  );
+});
+
+Button.displayName = "Button";

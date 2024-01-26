@@ -3,7 +3,6 @@ import styles from "./LobbyList.module.scss";
 import { ILobby } from "../../../../../shared/types/lobby.ts";
 
 import { formatTimestamp } from "./helpers.ts";
-import { ConnectionStateIndicator } from "../../../components/ConnectionStateIndicator/ConnectionStateIndicator.tsx";
 import { useSocket, useSocketSubscription } from "../../../context/WebSocketContext.tsx";
 import { useApi } from "../../../hooks/useApi.ts";
 import { ProtectedPaths } from "../../../Router/RouterPaths.ts";
@@ -22,16 +21,10 @@ export const LobbyList: FC = () => {
 
   const lobbysApi = useApi();
 
-  console.log(lobbys);
   const handleJoinLobby = async (lobbyId: ILobby["id"]) => {
     lobbysApi.call("/lobbys/join", { method: "POST", body: JSON.stringify({ lobbyId }) });
-    socket?.joinLobby(lobbyId);
+    socket.client?.joinLobby(lobbyId);
   };
-
-  // const handleSubmitTextMessage = (e: FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   webRTCClient.sendMessage(RTCEventType.CHAT, testInputValue);
-  // };
 
   return (
     <>
@@ -40,7 +33,6 @@ export const LobbyList: FC = () => {
         Create lobby
       </Button>
       <div className={styles.lobbyList}>
-        <ConnectionStateIndicator state={WebSocket.CLOSED} />
         <div className={styles.listHeader}>
           <div>ID</div>
           <div>NAME</div>
@@ -49,26 +41,35 @@ export const LobbyList: FC = () => {
           <div>PLAYERS</div>
           <div>actions</div>
         </div>
-        {lobbys?.map((lobby) => (
-          <div key={lobby.id} className={styles.singleLobby}>
-            <div>{lobby.id}</div>
-            <div>{lobby.name}</div>
-            <div>{formatTimestamp(lobby.createdAt)}</div>
-            <div>{lobby.hostId}</div>
-            <div>
-              <ol>
-                {Object.values(lobby.clients).map((clientId) => (
-                  <li key={clientId}>{clientId}</li>
-                ))}
-              </ol>
-            </div>
-            <div>
-              <button onClick={() => handleJoinLobby(lobby.id)}>JOIN</button>
-              {/*<button onClick={() => deleteLobby(lobby.id)}>DELETE</button>*/}
-            </div>
-          </div>
-        ))}
+        {lobbys?.length ? <LobbyListContent lobbys={lobbys} handleJoinLobby={handleJoinLobby} /> : <NoLobbysContent />}
       </div>
     </>
   );
 };
+
+const NoLobbysContent = () => <div className="text-center">No lobbys! Let's create a new one!</div>;
+
+type LobbyListContentProps = {
+  lobbys: ILobby[];
+  handleJoinLobby: (lobbyId: string) => void;
+};
+const LobbyListContent: FC<LobbyListContentProps> = ({ lobbys, handleJoinLobby }) =>
+  lobbys.map((lobby) => (
+    <div key={lobby.id} className={styles.singleLobby}>
+      <div>{lobby.id}</div>
+      <div>{lobby.name}</div>
+      <div>{formatTimestamp(lobby.createdAt)}</div>
+      <div>{lobby.hostId}</div>
+      <div>
+        <ol>
+          {Object.values(lobby.clients).map((clientId) => (
+            <li key={clientId}>{clientId}</li>
+          ))}
+        </ol>
+      </div>
+      <div>
+        <Button onClick={() => handleJoinLobby(lobby.id)}>JOIN</Button>
+        {/*<button onClick={() => deleteLobby(lobby.id)}>DELETE</button>*/}
+      </div>
+    </div>
+  ));

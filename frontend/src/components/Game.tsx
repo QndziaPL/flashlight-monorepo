@@ -7,13 +7,13 @@ export type GameProps = {};
 export const Game: FC<GameProps> = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<GameState>();
-  const socket = useSocket();
+  const {client} = useSocket();
 
   useEffect(() => {
     if (canvasRef.current)
       canvasRef.current.height = window.innerHeight;
       canvasRef.current.width = window.innerWidth;
-      setGameState(new GameState({ canvasRef: canvasRef.current, playerInput: new PlayerInput(), socket }));
+      setGameState(new GameState({ canvasRef: canvasRef.current, playerInput: new PlayerInput(), client: client }));
     }
   }, []);
 

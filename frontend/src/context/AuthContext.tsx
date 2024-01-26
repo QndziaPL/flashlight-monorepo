@@ -10,7 +10,9 @@ const AuthContext = createContext<AuthContextState>({ user: null, logout: async 
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthContextProvider: FC<{
+  children: ReactNode;
+}> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 

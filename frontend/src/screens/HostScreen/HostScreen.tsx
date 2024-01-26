@@ -23,7 +23,7 @@ export const HostScreen: FC<HostScreenProps> = () => {
     const createLobbyData: FECreateLobbyProps = {
       name: lobbyName,
     };
-    socket?.createLobby(createLobbyData);
+    socket.client?.createLobby(createLobbyData);
     navigate(withBackslash(ProtectedPaths.LOBBYS));
   };
 

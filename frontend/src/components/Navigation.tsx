@@ -4,21 +4,29 @@ import { useAuth } from "../context/AuthContext.tsx";
 import kupa from "/kupa.png";
 import { FC } from "react";
 import { Button } from "./Button.tsx";
+import { ConnectionPingIndicator } from "./ConnectionStateIndicator/ConnectionPingIndicator.tsx";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../@/components/ui/dropdown-menu.tsx";
 
 export const Navigation = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+
   return (
-    <nav>
+    <nav className="bg-secondary">
       <img src={kupa} alt="logo" />
-      <ul>{user ? <LoggedActionBar logout={logout} /> : <NotLoggedActionBar />}</ul>
+      <ConnectionPingIndicator />
+      <ul>{user ? <LoggedActionBar /> : <NotLoggedActionBar />}</ul>
     </nav>
   );
 };
 
-type LoggedActionBarProps = {
-  logout: () => void;
-};
-const LoggedActionBar: FC<LoggedActionBarProps> = ({ logout }) => (
+const LoggedActionBar: FC = () => (
   <>
     <li>
       <Button link={PublicPaths.HOME}>Home</Button>
@@ -30,9 +38,7 @@ const LoggedActionBar: FC<LoggedActionBarProps> = ({ logout }) => (
       <Button link={ProtectedPaths.LOBBYS}>Lobby List</Button>
     </li>
     <li>
-      <Button variant="ghost" onClick={logout}>
-        Logout
-      </Button>
+      <ProfileDropdown />
     </li>
   </>
 );
@@ -50,3 +56,24 @@ const NotLoggedActionBar = () => (
     </li>
   </>
 );
+
+const ProfileDropdown = () => {
+  const { user, logout } = useAuth();
+
+  return (
+    <div className="relative">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost">{user?.email}</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>My account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+            Log out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+};

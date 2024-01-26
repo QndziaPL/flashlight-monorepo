@@ -1,10 +1,21 @@
 .indicator {
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  background-color: gray;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
 }
 
-.connected {
-  background-color: green;
+.good {
+  background-color: #00dc00;
+}
+
+.average {
+  background-color: orange;
+}
+
+.bad {
+  background-color: #ff5b5b;
 }

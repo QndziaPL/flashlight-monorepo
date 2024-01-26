@@ -9,11 +9,16 @@ export class LobbyService {
   }
 
   public createLobby(data: CreateLobbyProps) {
+    if (this._lobbys.some((lobby) => lobby.clients.includes(data.hostId))) {
+      throw Error(`Couldn't create lobby. Client ${data.hostId} is already part of an other lobby`);
+    }
+    const id = uuid();
     const lobby: ILobby = {
       ...data,
-      id: uuid(),
+      id,
     };
     this._lobbys.push(lobby);
+    return id;
   }
 
   //TODO: consider generic error handling for ws (for example, someone tries to join lobby but there is no lobby with sent id)

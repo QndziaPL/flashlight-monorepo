@@ -46,6 +46,9 @@ module.exports = {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
         },
+        navBackground: {
+          DEFAULT: "var(--nav-background)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
