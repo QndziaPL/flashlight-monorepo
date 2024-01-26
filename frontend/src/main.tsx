@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
-import "./index.css";
+import "./index.scss";
+import "./_variables.scss";
 import { AppContextProvider } from "./context/AppContext.tsx";
 import { WebSocketProvider } from "./context/WebSocketContext.tsx";
 
@@ -8,31 +9,45 @@ import { Home } from "./screens/Home.tsx";
 import { LoginScreen } from "./screens/LoginScreen/LoginScreen.tsx";
 import { RegisterScreen } from "./screens/RegisterScreen/RegisterScreen.tsx";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
-import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
-import { JoinScreen } from "./screens/JoinScreen/JoinScreen.tsx";
+import { ProtectedLayout } from "./Router/RouterLayouts/ProtectedLayout.tsx";
+import { LobbysScreen } from "./screens/JoinScreen/LobbysScreen.tsx";
+import { ProtectedPaths, PublicPaths } from "./Router/RouterPaths.ts";
+import { PublicLayout } from "./Router/RouterLayouts/PublicLayout.tsx";
+import { HostScreen } from "./screens/HostScreen/HostScreen.tsx";
+import { ToastContextProvider } from "./context/ToastContext.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <PublicLayout />,
     children: [
       {
-        path: "login",
+        path: PublicPaths.HOME,
+        element: <Home />,
+      },
+      {
+        path: PublicPaths.LOGIN,
         element: <LoginScreen />,
       },
       {
-        path: "register",
+        path: PublicPaths.REGISTER,
         element: <RegisterScreen />,
       },
     ],
   },
   {
-    path: "/lobbys",
-    element: (
-      <ProtectedRoute>
-        <JoinScreen />
-      </ProtectedRoute>
-    ),
+    path: "",
+    element: <ProtectedLayout />,
+    children: [
+      {
+        path: ProtectedPaths.LOBBYS,
+        element: <LobbysScreen />,
+      },
+      {
+        path: ProtectedPaths.HOST,
+        element: <HostScreen />,
+      },
+    ],
   },
 ]);
 
@@ -40,7 +55,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <AuthContextProvider>
     <AppContextProvider>
       <WebSocketProvider>
-        <RouterProvider router={router} />
+        <ToastContextProvider>
+          <RouterProvider router={router} />
+        </ToastContextProvider>
+        {/*<Navigate to="home" />*/}
       </WebSocketProvider>
     </AppContextProvider>
   </AuthContextProvider>,

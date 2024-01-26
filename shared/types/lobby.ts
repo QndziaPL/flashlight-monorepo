@@ -7,4 +7,4 @@ export type ILobby = {
 };
 
 export type CreateLobbyProps = Omit<ILobby, "id">;
-export type FECreateLobbyProps = Omit<CreateLobbyProps, "clients" | "createdAt">;
+export type FECreateLobbyProps = Omit<CreateLobbyProps, "clients" | "createdAt" | "hostId">;

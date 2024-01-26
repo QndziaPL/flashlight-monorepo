@@ -1,29 +1,30 @@
 import { FC, useState } from "react";
 import { useIpAddress } from "../../hooks/useIpAddress.ts";
-import { ConnectionMode, useAppContext } from "../../context/AppContext.tsx";
 import { FECreateLobbyProps } from "../../../../shared/types/lobby.ts";
-import { useApi } from "../../hooks/useApi.ts";
 import { useSocket } from "../../context/WebSocketContext.tsx";
+import { useNavigate } from "react-router";
+import { ProtectedPaths } from "../../Router/RouterPaths.ts";
+import { withBackslash } from "../../Router/helpers.ts";
 
 export type HostScreenProps = {};
 export const HostScreen: FC<HostScreenProps> = () => {
   const { ip, error, loading } = useIpAddress();
-  const { setMode, clientId } = useAppContext();
+
   const socket = useSocket();
+  const navigate = useNavigate();
 
   const [lobbyName, setLobbyName] = useState<string>("");
-
-  const createLobbyAPI = useApi<{ lobbyId: string }>();
 
   const handleCreateLobby = async () => {
     const createLobbyData: FECreateLobbyProps = {
       name: lobbyName,
-      hostId: clientId,
     };
+    console.log(socket);
 
     // const data = await createLobbyAPI.call("/lobbys", { method: "POST", body: JSON.stringify(createLobbyData) });
-    socket.emit({ eventName: "CREATE_LOBBY", data: createLobbyData });
-    setMode(ConnectionMode.JOIN);
+    socket?.createLobby(createLobbyData);
+    navigate(withBackslash(ProtectedPaths.LOBBYS));
+
     // if (data.lobbyId) {
     //   socket.joinRoom(data.lobbyId);
     //   setMode(ConnectionMode.JOIN);
@@ -46,7 +47,6 @@ export const HostScreen: FC<HostScreenProps> = () => {
       <button onClick={handleCreateLobby} disabled={lobbyName.length < 3}>
         create lobby
       </button>
-      <button onClick={() => setMode(ConnectionMode.NOT_SELECTED)}>back to main menu</button>
     </div>
   );
 };

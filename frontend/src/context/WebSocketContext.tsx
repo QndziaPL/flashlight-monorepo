@@ -1,12 +1,12 @@
-import { createContext, FC, ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { createContext, FC, ReactNode, useContext, useEffect, useState } from "react";
 import { EmitFunctionProps, SocketClient } from "../socket/Socket.ts";
-import { useAppContext } from "./AppContext.tsx";
 import {
   DataFromEventCallback,
   EventsFromServer,
   EventsFromServerKeys,
   EventsToServerKeys,
 } from "../../../shared/types/websocket.ts";
+import { useAuth } from "./AuthContext.tsx";
 
 type WebSocketState = SocketClient | null;
 
@@ -18,25 +18,25 @@ type WebSocketProviderProps = {
 const BACKEND_URL = import.meta.env.VITE_API_URL ?? "http://localhost";
 
 export const WebSocketProvider: FC<WebSocketProviderProps> = ({ children }) => {
-  const { clientId } = useAppContext();
-  const socketRef = useRef<SocketClient | null>(null);
-  const [initialized, setInitialized] = useState(false);
+  const { user } = useAuth();
+  const [socket, setSocket] = useState<SocketClient | null>(null);
 
   useEffect(() => {
-    socketRef.current = new SocketClient(BACKEND_URL, clientId);
-    setInitialized(true);
-  }, []);
+    if (user) {
+      setSocket(new SocketClient(BACKEND_URL, user.uid));
+    }
 
-  return <WebSocketContext.Provider value={socketRef.current}>{initialized && children}</WebSocketContext.Provider>;
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [user]);
+
+  return <WebSocketContext.Provider value={socket}>{children}</WebSocketContext.Provider>;
 };
 
-export const useSocket = () => {
-  const socket = useContext(WebSocketContext);
-
-  if (!socket) throw Error("socket client not initialised");
-
-  return socket;
-};
+export const useSocket = () => useContext(WebSocketContext);
 
 type SocketSubscriptionProps<T extends EventsToServerKeys> = {
   eventName: EventsFromServerKeys;
@@ -45,7 +45,7 @@ type SocketSubscriptionProps<T extends EventsToServerKeys> = {
 
 export const useSocketSubscription = <
   KeyOfEventsFromServer extends EventsFromServerKeys,
-  AutoFireEvent extends EventsToServerKeys,
+  AutoFireEvent extends EventsToServerKeys = never,
 >({
   eventName,
   autoFireEvent,
@@ -57,12 +57,12 @@ export const useSocketSubscription = <
   const [data, setData] = useState<DataFromEventCallback<EventsFromServer[KeyOfEventsFromServer]> | undefined>();
 
   useEffect(() => {
-    socket.subscribe(eventName, setData, autoFireEvent);
+    socket?.subscribe(eventName, setData, autoFireEvent);
 
     return () => {
-      socket.unsubscribe(eventName, setData);
+      socket?.unsubscribe(eventName, setData);
     };
-  }, []);
+  }, [socket]);
 
   return [data];
 };

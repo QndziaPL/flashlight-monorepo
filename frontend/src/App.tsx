@@ -1,7 +1,7 @@
 import "./App.css";
 import { ConnectionMode, useAppContext } from "./context/AppContext.tsx";
 import { ChooseModeScreen } from "./screens/ChooseModeScreen.tsx";
-import { JoinScreen } from "./screens/JoinScreen/JoinScreen.tsx";
+import { LobbysScreen } from "./screens/JoinScreen/LobbysScreen.tsx";
 import { HostScreen } from "./screens/HostScreen/HostScreen.tsx";
 
 const App = () => {
@@ -12,7 +12,7 @@ const App = () => {
   }
 
   if (mode === ConnectionMode.JOIN) {
-    return <JoinScreen />;
+    return <LobbysScreen />;
   }
   console.log(mode, hosted);
   if (mode === ConnectionMode.HOST && !hosted) {

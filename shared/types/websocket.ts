@@ -1,4 +1,3 @@
-import { SocketClient } from "../../frontend/src/socket/Socket";
 import { FECreateLobbyProps, ILobby } from "./lobby";
 
 export type DisconnectReason =
@@ -35,7 +34,9 @@ type EventCallback<T> = (props: T) => void;
 
 export type EventsToServer = {
   CHAT_MESSAGE: EventCallback<IChatMessageClient>;
-  JOIN_LOBBY: EventCallback<{ clientId: SocketClient["clientId"]; room: string }>;
+  JOIN_LOBBY: EventCallback<{
+    lobbyId: string;
+  }>;
   CREATE_LOBBY: EventCallback<FECreateLobbyProps>;
   GET_LOBBY_LIST: EventCallback<undefined>;
 } & SocketReservedEvents;
@@ -46,8 +47,19 @@ export type EventsFromServer = {
   CHAT_MESSAGE: EventCallback<IChatMessage>;
   INFO_MESSAGE: EventCallback<string>;
   LOBBY_LIST: EventCallback<ILobby[]>;
+  ERROR_MESSAGE: EventCallback<ErrorMesssage>;
 } & SocketReservedEvents;
 
 export type EventsFromServerKeys = keyof EventsFromServer;
 
 export type DataFromEventCallback<Callback> = Callback extends EventCallback<infer Data> ? Data : never;
+
+export enum ErrorMessageType {
+  GENERAL = "general",
+}
+
+export type ErrorMesssage = {
+  message: string;
+  type: ErrorMessageType;
+  id: string;
+};

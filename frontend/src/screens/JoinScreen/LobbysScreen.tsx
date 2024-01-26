@@ -5,7 +5,7 @@ import { ILobby } from "../../../../shared/types/lobby.ts";
 import { useApi } from "../../hooks/useApi.ts";
 
 export type JoinScreenProps = {};
-export const JoinScreen: FC<JoinScreenProps> = () => {
+export const LobbysScreen: FC<JoinScreenProps> = () => {
   const { setMode } = useAppContext();
   const [address, setAddress] = useState("");
 

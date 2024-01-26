@@ -3,13 +3,15 @@ import styles from "./LobbyList.module.scss";
 import { ILobby } from "../../../../../shared/types/lobby.ts";
 
 import { formatTimestamp } from "./helpers.ts";
-import { ConnectionMode, useAppContext } from "../../../context/AppContext.tsx";
 import { ConnectionStateIndicator } from "../../../components/ConnectionStateIndicator/ConnectionStateIndicator.tsx";
 import { useSocket, useSocketSubscription } from "../../../context/WebSocketContext.tsx";
 import { useApi } from "../../../hooks/useApi.ts";
+import { ProtectedPaths } from "../../../Router/RouterPaths.ts";
+import { useNavigate } from "react-router";
+import { withBackslash } from "../../../Router/helpers.ts";
 
 export const LobbyList: FC = () => {
-  const { setMode } = useAppContext();
+  const navigate = useNavigate();
   const socket = useSocket();
 
   const [lobbys] = useSocketSubscription<"LOBBY_LIST", "GET_LOBBY_LIST">({
@@ -22,7 +24,7 @@ export const LobbyList: FC = () => {
   console.log(lobbys);
   const handleJoinLobby = async (lobbyId: ILobby["id"]) => {
     lobbysApi.call("/lobbys/join", { method: "POST", body: JSON.stringify({ lobbyId }) });
-    // socket.joinRoom(lobbyId);
+    socket?.joinLobby(lobbyId);
   };
 
   // const handleSubmitTextMessage = (e: FormEvent<HTMLFormElement>) => {
@@ -33,7 +35,7 @@ export const LobbyList: FC = () => {
   return (
     <>
       <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>active lobbys</h1>
-      <button onClick={() => setMode(ConnectionMode.HOST)}>host screen</button>
+      <button onClick={() => navigate(withBackslash(ProtectedPaths.HOST))}>host screen</button>
       <div className={styles.lobbyList}>
         <ConnectionStateIndicator state={WebSocket.CLOSED} />
         <div className={styles.listHeader}>

@@ -1,8 +1,9 @@
 import http from "http";
 import { Server } from "socket.io";
-import { EventsFromServer, EventsToServer } from "../../shared/types/websocket";
+import { ErrorMessageType, EventsFromServer, EventsToServer } from "../../shared/types/websocket";
 import { LobbyService } from "../services/LobbyService";
 import { ClientsService } from "../services/ClientsService";
+import { v4 } from "uuid";
 
 export class WebSocketClient {
   private io: Server<EventsToServer, EventsFromServer>;
@@ -20,17 +21,27 @@ export class WebSocketClient {
 
   private initializeEvents(): void {
     this.io.on("connection", (socket) => {
-      console.log(`Connected client with socketId: ${socket.id}`);
+      const clientId = socket.handshake.auth.clientId;
+      console.log(`Connected WS client ${clientId}`);
       socket.emit("LOBBY_LIST", this.lobbyService.lobbys);
 
-      socket.on("JOIN_LOBBY", async ({ clientId, room }) => {
-        await socket.join(room);
-        const infoMessage = `Client with id: ${clientId} joined "${room}" room`;
-        socket.to(room).emit("INFO_MESSAGE", infoMessage);
+      socket.on("JOIN_LOBBY", async ({ lobbyId }) => {
+        await socket.join(lobbyId);
+        const infoMessage = `Client with id: ${clientId} joined "${lobbyId}" lobby and ws-room with same id`;
+        socket.to(lobbyId).emit("INFO_MESSAGE", infoMessage);
+        try {
+          this.lobbyService.joinLobby(lobbyId, clientId);
+        } catch (error) {
+          console.error(error);
+          const errorMessage = error instanceof Error ? error.message : "An unknown error...";
+          socket.emit("ERROR_MESSAGE", { type: ErrorMessageType.GENERAL, message: errorMessage, id: v4() });
+        }
+
+        this.io.emit("LOBBY_LIST", this.lobbyService.lobbys);
       });
 
       socket.on("CREATE_LOBBY", (data) => {
-        this.lobbyService.createLobby({ ...data, clients: [data.hostId], createdAt: Date.now() });
+        this.lobbyService.createLobby({ ...data, clients: [clientId], createdAt: Date.now(), hostId: clientId });
         this.io.emit("LOBBY_LIST", this.lobbyService.lobbys);
       });
 

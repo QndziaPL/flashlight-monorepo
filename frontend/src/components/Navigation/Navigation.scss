@@ -1,0 +1,27 @@
+@import '../../variables';
+
+nav {
+  background-color: gray;
+  height: $nav-height;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+
+  ul {
+    display: flex;
+    gap: 1rem;
+  }
+
+  li {
+    list-style-type: none;
+  }
+
+  img {
+    height: 100%;
+  }
+
+  a {
+    cursor: pointer;
+  }
+}
