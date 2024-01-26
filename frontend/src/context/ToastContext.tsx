@@ -1,5 +1,6 @@
 import { createContext, FC, ReactNode, useContext, useEffect, useState } from "react";
 import { useSocketSubscription } from "./WebSocketContext.tsx";
+import { toast } from "../@/components/ui/use-toast.ts";
 
 type Toast = {
   id: string;
@@ -21,6 +22,14 @@ export const ToastContextProvider: FC<{
       setToasts((prev) => [...prev, { id: error.id, message: error.message }]);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (toasts.length) {
+      toast({
+        description: toasts[toasts.length - 1].message,
+      });
+    }
+  }, [toasts]);
 
   console.log(error, toasts);
 
