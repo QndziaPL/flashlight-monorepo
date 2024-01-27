@@ -41,11 +41,11 @@ export class WebSocketClient {
       });
 
       socket.on("PING", async (data) => {
-        // await delay(50);
+        // await delay(123);
         socket.emit("PONG", { pongId: data.pingId });
       });
 
-      socket.on("CREATE_LOBBY", async (data) => {
+      socket.on("CREATE_LOBBY", async (data, callback) => {
         try {
           const lobbyId = this.lobbyService.createLobby({
             ...data,
@@ -55,8 +55,9 @@ export class WebSocketClient {
           });
           await socket.join(lobbyId);
           this.io.emit("LOBBY_LIST", this.lobbyService.lobbys);
-          const infoMessage = `You succesfully created lobby`;
+          const infoMessage = `You successfully created lobby`;
           socket.emit("INFO_MESSAGE", { type: InfoMessageType.GENERAL, message: infoMessage, id: v4() });
+          callback({ lobbyId });
         } catch (error) {
           console.error(error);
           const errorMessage = error instanceof Error ? error.message : "An unknown error...";

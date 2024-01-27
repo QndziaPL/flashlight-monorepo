@@ -31,13 +31,23 @@ export type IChatMessage = {
 export type IChatMessageClient = Pick<IChatMessage, "text" | "author">;
 
 type EventCallback<T> = (props: T) => void;
+type EventCallbackWithCallback<TProps, TResponse> = (
+  props: TProps,
+  callback: (data: TResponse) => void,
+) => Promise<void>;
 
 export type EventsToServer = {
   CHAT_MESSAGE: EventCallback<IChatMessageClient>;
   JOIN_LOBBY: EventCallback<{
     lobbyId: string;
   }>;
-  CREATE_LOBBY: EventCallback<FECreateLobbyProps>;
+  CREATE_LOBBY: EventCallbackWithCallback<
+    FECreateLobbyProps,
+    {
+      lobbyId: string;
+    }
+  >;
+  // CREATE_LOBBY: EventCallback<FECreateLobbyProps>;
   GET_LOBBY_LIST: EventCallback<undefined>;
   PING: EventCallback<{
     pingId: string;

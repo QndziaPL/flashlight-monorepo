@@ -1,7 +1,7 @@
 export const Home = () => {
   return (
     <div>
-      <h1>Epic multiplayer endless dungeon crawler</h1>
+      <h1>Jebać stare kurwy na pizdę</h1>
     </div>
   );
 };

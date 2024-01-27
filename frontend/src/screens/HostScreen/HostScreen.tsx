@@ -8,6 +8,9 @@ import { withBackslash } from "../../Router/helpers.ts";
 import { Button } from "../../components/Button.tsx";
 import { Input } from "../../@/components/ui/input.tsx";
 import { Label } from "../../@/components/ui/label.tsx";
+import { useLobby } from "../../context/LobbyContext.tsx";
+import { useToasts } from "../../context/ToastContext.tsx";
+import { v4 } from "uuid";
 
 export type HostScreenProps = {};
 export const HostScreen: FC<HostScreenProps> = () => {
@@ -15,6 +18,8 @@ export const HostScreen: FC<HostScreenProps> = () => {
 
   const socket = useSocket();
   const navigate = useNavigate();
+  const { addToast } = useToasts();
+  const { setLobbyId } = useLobby();
 
   const [lobbyName, setLobbyName] = useState<string>("");
 
@@ -23,8 +28,21 @@ export const HostScreen: FC<HostScreenProps> = () => {
     const createLobbyData: FECreateLobbyProps = {
       name: lobbyName,
     };
-    socket.client?.createLobby(createLobbyData);
-    navigate(withBackslash(ProtectedPaths.LOBBYS));
+    try {
+      const lobbyId = await socket.client?.createLobby(createLobbyData);
+      if (lobbyId) {
+        setLobbyId(lobbyId);
+        navigate(withBackslash(ProtectedPaths.LOBBY));
+      }
+    } catch (error) {
+      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error during creation of lobby";
+      addToast({
+        id: v4(),
+        type: "error",
+        message: errorMessage,
+      });
+    }
   };
 
   return (

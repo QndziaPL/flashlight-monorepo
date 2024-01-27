@@ -11,7 +11,7 @@ export const PublicLayout = () => {
   const onHome = pathname === withBackslash(PublicPaths.HOME);
 
   if (user && !onHome) {
-    return <Navigate to={ProtectedPaths.LOBBYS} replace />;
+    return <Navigate to={ProtectedPaths.LOBBY_LIST} replace />;
   }
 
   return (

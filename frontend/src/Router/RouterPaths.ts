@@ -5,6 +5,7 @@ export enum PublicPaths {
 }
 
 export enum ProtectedPaths {
-  LOBBYS = "lobbys",
+  LOBBY_LIST = "lobbyList",
   HOST = "host",
+  LOBBY = "lobby",
 }

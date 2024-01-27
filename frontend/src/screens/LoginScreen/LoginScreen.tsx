@@ -5,6 +5,8 @@ import { useNavigate } from "react-router";
 import { Button } from "../../components/Button.tsx";
 import { Input } from "../../@/components/ui/input.tsx";
 import { Label } from "../../@/components/ui/label.tsx";
+import { ProtectedPaths } from "../../Router/RouterPaths.ts";
+import { withBackslash } from "../../Router/helpers.ts";
 
 type LoginScreenProps = {};
 export const LoginScreen: FC<LoginScreenProps> = () => {
@@ -21,7 +23,7 @@ export const LoginScreen: FC<LoginScreenProps> = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log(userCredential.user);
-      navigate("/lobbys");
+      navigate(withBackslash(ProtectedPaths.LOBBY_LIST));
     } catch (e) {
       console.log(e);
     }

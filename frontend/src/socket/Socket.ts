@@ -49,8 +49,16 @@ export class SocketClient {
     this.socket.emit("JOIN_LOBBY", { lobbyId });
   }
 
-  createLobby(data: FECreateLobbyProps) {
-    this.socket.emit("CREATE_LOBBY", data);
+  async createLobby(data: FECreateLobbyProps): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.socket.emit("CREATE_LOBBY", data, (response) => {
+        if (response.lobbyId) {
+          resolve(response.lobbyId);
+        } else {
+          reject(new Error("Couldn't create lobby"));
+        }
+      });
+    });
   }
 
   setClientId(clientId: string) {

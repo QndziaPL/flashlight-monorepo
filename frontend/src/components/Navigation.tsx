@@ -35,7 +35,7 @@ const LoggedActionBar: FC = () => (
       <Button link={ProtectedPaths.HOST}>Host</Button>
     </li>
     <li>
-      <Button link={ProtectedPaths.LOBBYS}>Lobby List</Button>
+      <Button link={ProtectedPaths.LOBBY_LIST}>Lobby List</Button>
     </li>
     <li>
       <ProfileDropdown />

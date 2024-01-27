@@ -4,26 +4,26 @@ import { ILobby } from "../../../../../shared/types/lobby.ts";
 
 import { formatTimestamp } from "./helpers.ts";
 import { useSocket, useSocketSubscription } from "../../../context/WebSocketContext.tsx";
-import { useApi } from "../../../hooks/useApi.ts";
 import { ProtectedPaths } from "../../../Router/RouterPaths.ts";
 import { useNavigate } from "react-router";
 import { withBackslash } from "../../../Router/helpers.ts";
 import { Button } from "../../../components/Button.tsx";
+import { useLobby } from "../../../context/LobbyContext.tsx";
 
 export const LobbyList: FC = () => {
   const navigate = useNavigate();
   const socket = useSocket();
+  const { setLobbyId } = useLobby();
 
   const [lobbys] = useSocketSubscription<"LOBBY_LIST", "GET_LOBBY_LIST">({
     eventName: "LOBBY_LIST",
     autoFireEvent: { eventName: "GET_LOBBY_LIST", data: undefined },
   });
 
-  const lobbysApi = useApi();
-
   const handleJoinLobby = async (lobbyId: ILobby["id"]) => {
-    lobbysApi.call("/lobbys/join", { method: "POST", body: JSON.stringify({ lobbyId }) });
     socket.client?.joinLobby(lobbyId);
+    setLobbyId(lobbyId);
+    navigate(withBackslash(ProtectedPaths.LOBBY));
   };
 
   return (
