@@ -1,6 +1,8 @@
-import { CreateLobbyProps, ILobby } from "../../shared/types/lobby";
+import { CreateLobbyProps, ILobby } from "../../../../shared/types/lobby";
 import { v4 as uuid } from "uuid";
+import { injectable } from "inversify";
 
+@injectable()
 export class LobbyService {
   private _lobbys: ILobby[] = [];
 

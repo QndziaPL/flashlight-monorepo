@@ -1,4 +1,4 @@
-import { GameService } from "../services/GameService/GameService";
+import { GameService } from "../di/injectables/GameService/GameService";
 import { v4 } from "uuid";
 
 export type GameSnapshotForDB = {

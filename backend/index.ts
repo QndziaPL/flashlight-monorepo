@@ -1,22 +1,20 @@
 import dotenv from "dotenv";
-import { WebSocketService } from "./di/injectables/WebSocketService";
-import { LobbyService } from "./services/LobbyService";
-import LobbyRouter from "./router/LobbyRouter";
-import { GameService } from "./services/GameService/GameService";
-import { ServerService } from "./di/injectables/ServerService";
+import { ServerService } from "./di/injectables/ServerService/ServerService";
+import { container } from "./di/inversify.config";
+import { INJECTABLE_TYPES } from "./di/injectables/types";
+import { GameService } from "./di/injectables/GameService/GameService";
+import { WebSocketService } from "./di/injectables/WebSocketService/WebSocketService";
+import { LobbyService } from "./di/injectables/LobbyService/LobbyService";
 
 dotenv.config();
 
-const lobbyService = new LobbyService();
-const serverService = new ServerService();
-const webSocketClient = new WebSocketService(serverService, lobbyService);
-const lobbyRouter = new LobbyRouter(lobbyService, webSocketClient);
-const gameService = new GameService(lobbyService, webSocketClient);
+container.get<ServerService>(INJECTABLE_TYPES.ServerService);
+container.get<LobbyService>(INJECTABLE_TYPES.LobbyService);
+container.get<WebSocketService>(INJECTABLE_TYPES.WebSocketService);
+container.get<GameService>(INJECTABLE_TYPES.GameService);
 
 // app.get("/", (req: Request, res: Response) => {
 //   res.send("Elo kurwy");
 // });
 //
 // app.use("/api/lobbys", lobbyRouter.getRouter());
-
-// server.listen(port, () => console.log(`Http napierdala na porcie: ${port}`));

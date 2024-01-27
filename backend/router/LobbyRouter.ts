@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import { FirebaseClient } from "../firebase/firebase";
-import { LobbyService } from "../services/LobbyService";
-import { WebSocketService } from "../di/injectables/WebSocketService";
+import { LobbyService } from "../di/injectables/LobbyService/LobbyService";
+import { WebSocketService } from "../di/injectables/WebSocketService/WebSocketService";
 
 export default class LobbyRouter {
   private router: Router;

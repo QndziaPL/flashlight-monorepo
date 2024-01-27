@@ -1,18 +1,26 @@
 import { Server as WebSocketServer } from "socket.io";
-import { ErrorMessageType, EventsFromServer, EventsToServer, InfoMessageType } from "../../../shared/types/websocket";
-import { LobbyService } from "../../services/LobbyService";
-import { ClientsService } from "../../services/ClientsService";
+import {
+  ErrorMessageType,
+  EventsFromServer,
+  EventsToServer,
+  InfoMessageType,
+} from "../../../../shared/types/websocket";
+import { LobbyService } from "../LobbyService/LobbyService";
+import { ClientsService } from "../../../services/ClientsService/ClientsService";
 import { v4 } from "uuid";
-import { ServerService } from "./ServerService";
+import { ServerService } from "../ServerService/ServerService";
+import { inject, injectable } from "inversify";
+import { INJECTABLE_TYPES } from "../types";
 
-//TODO: odwrócić dependencje - najpierw stworzyć WSClient i dopiero jego przekazać do lobby client
+@injectable()
 export class WebSocketService {
   private io: WebSocketServer<EventsToServer, EventsFromServer>;
-  private lobbyService: LobbyService;
   private players: ClientsService = new ClientsService();
 
-  constructor(serverService: ServerService, lobbyService: LobbyService) {
-    // constructor(httpServer: http.Server, lobbyService: LobbyService) {
+  constructor(
+    @inject(INJECTABLE_TYPES.ServerService) private readonly serverService: ServerService,
+    @inject(INJECTABLE_TYPES.LobbyService) private readonly lobbyService: LobbyService,
+  ) {
     this.lobbyService = lobbyService;
     this.io = new WebSocketServer<EventsToServer, EventsFromServer>(serverService.server, {
       cors: { origin: "*" },
