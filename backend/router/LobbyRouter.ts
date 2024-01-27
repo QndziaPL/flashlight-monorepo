@@ -1,14 +1,14 @@
 import express, { Request, Response, Router } from "express";
 import { FirebaseClient } from "../firebase/firebase";
 import { LobbyService } from "../services/LobbyService";
-import { WebSocketClient } from "../websocket/websocket";
+import { WebSocketService } from "../di/injectables/WebSocketService";
 
 export default class LobbyRouter {
   private router: Router;
   private lobbyService: LobbyService;
-  private webSocketClient: WebSocketClient;
+  private webSocketClient: WebSocketService;
 
-  constructor(lobbyService: LobbyService, webSocketClient: WebSocketClient) {
+  constructor(lobbyService: LobbyService, webSocketClient: WebSocketService) {
     this.router = express.Router();
     this.lobbyService = lobbyService;
     this.webSocketClient = webSocketClient;
@@ -51,7 +51,10 @@ type ValidationResponse =
   | {
       status: "ok";
     }
-  | { status: "error"; reason: string };
+  | {
+      status: "error";
+      reason: string;
+    };
 const ROUTE = "/lobbys";
 const router = express.Router();
 const firebase = FirebaseClient.getInstance();

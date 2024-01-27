@@ -1,13 +1,13 @@
 import { Game, GameProps, GameSnapshotForDB } from "../../game/Game";
 import { LobbyService } from "../LobbyService";
-import { WebSocketClient } from "../../websocket/websocket";
+import { WebSocketService } from "../../di/injectables/WebSocketService";
 
 export class GameService {
   private games: Map<Game["id"], Game> = new Map();
   private readonly lobbyService: LobbyService;
-  private readonly webSocketClient: WebSocketClient;
+  private readonly webSocketClient: WebSocketService;
 
-  constructor(lobbyService: LobbyService, webSocketClient: WebSocketClient) {
+  constructor(lobbyService: LobbyService, webSocketClient: WebSocketService) {
     this.lobbyService = lobbyService;
     this.webSocketClient = webSocketClient;
   }

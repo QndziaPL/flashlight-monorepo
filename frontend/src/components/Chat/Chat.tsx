@@ -18,7 +18,7 @@ export const Chat: FC = () => {
       <div className="flex">
         <Input id="lobbyName" type="text" value={message} onChange={(e) => setMessage(e.target.value)} />
         <Button type="submit" disabled={message.length < 3}>
-          create lobby
+          send message
         </Button>
       </div>
     </div>

@@ -1,19 +1,20 @@
-import http from "http";
-import { Server } from "socket.io";
-import { ErrorMessageType, EventsFromServer, EventsToServer, InfoMessageType } from "../../shared/types/websocket";
-import { LobbyService } from "../services/LobbyService";
-import { ClientsService } from "../services/ClientsService";
+import { Server as WebSocketServer } from "socket.io";
+import { ErrorMessageType, EventsFromServer, EventsToServer, InfoMessageType } from "../../../shared/types/websocket";
+import { LobbyService } from "../../services/LobbyService";
+import { ClientsService } from "../../services/ClientsService";
 import { v4 } from "uuid";
+import { ServerService } from "./ServerService";
 
 //TODO: odwrócić dependencje - najpierw stworzyć WSClient i dopiero jego przekazać do lobby client
-export class WebSocketClient {
-  private io: Server<EventsToServer, EventsFromServer>;
+export class WebSocketService {
+  private io: WebSocketServer<EventsToServer, EventsFromServer>;
   private lobbyService: LobbyService;
   private players: ClientsService = new ClientsService();
 
-  constructor(httpServer: http.Server, lobbyService: LobbyService) {
+  constructor(serverService: ServerService, lobbyService: LobbyService) {
+    // constructor(httpServer: http.Server, lobbyService: LobbyService) {
     this.lobbyService = lobbyService;
-    this.io = new Server<EventsToServer, EventsFromServer>(httpServer, {
+    this.io = new WebSocketServer<EventsToServer, EventsFromServer>(serverService.server, {
       cors: { origin: "*" },
     });
 
