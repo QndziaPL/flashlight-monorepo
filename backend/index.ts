@@ -5,6 +5,7 @@ import http from "http";
 import { WebSocketClient } from "./websocket/websocket";
 import { LobbyService } from "./services/LobbyService";
 import LobbyRouter from "./router/LobbyRouter";
+import { GameService } from "./services/GameService/GameService";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ const port = process.env.PORT ?? 80;
 const lobbyService = new LobbyService();
 const webSocketClient = new WebSocketClient(server, lobbyService);
 const lobbyRouter = new LobbyRouter(lobbyService, webSocketClient);
+const gameService = new GameService(lobbyService, webSocketClient);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Elo kurwy");

@@ -82,7 +82,6 @@ export class SocketClient {
   ) {
     this.socket.on<EventsFromServerKeys>(eventName, callback);
     this.subscribers.push({ eventName, callback });
-    console.log(this.subscribers);
 
     if (emit) {
       // @ts-ignore

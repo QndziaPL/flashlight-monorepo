@@ -4,6 +4,7 @@ import { ProtectedPaths } from "../../Router/RouterPaths.ts";
 import { Toast } from "../../context/ToastContext.tsx";
 import { v4 } from "uuid";
 import { withBackslash } from "../../Router/helpers.ts";
+import { Chat } from "../../components/Chat/Chat.tsx";
 
 export const SingleLobbyScreen = () => {
   const { lobbyId, setLobbyId } = useLobby();
@@ -20,6 +21,7 @@ export const SingleLobbyScreen = () => {
   return (
     <div>
       <h1>Lobby: {lobbyId}</h1>
+      <Chat />
     </div>
   );
 };

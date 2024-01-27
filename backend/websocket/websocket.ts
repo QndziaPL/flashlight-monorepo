@@ -5,6 +5,7 @@ import { LobbyService } from "../services/LobbyService";
 import { ClientsService } from "../services/ClientsService";
 import { v4 } from "uuid";
 
+//TODO: odwrócić dependencje - najpierw stworzyć WSClient i dopiero jego przekazać do lobby client
 export class WebSocketClient {
   private io: Server<EventsToServer, EventsFromServer>;
   private lobbyService: LobbyService;
