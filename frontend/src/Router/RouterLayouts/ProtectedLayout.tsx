@@ -10,7 +10,6 @@ export const ProtectedLayout: FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.log(location);
     if (location.state?.toast) {
       addToast(location.state.toast);
     }

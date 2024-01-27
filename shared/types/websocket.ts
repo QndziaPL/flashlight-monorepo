@@ -47,7 +47,6 @@ export type EventsToServer = {
       lobbyId: string;
     }
   >;
-  // CREATE_LOBBY: EventCallback<FECreateLobbyProps>;
   GET_LOBBY_LIST: EventCallback<undefined>;
   PING: EventCallback<{
     pingId: string;

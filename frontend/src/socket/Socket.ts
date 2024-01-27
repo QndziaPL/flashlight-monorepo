@@ -104,10 +104,6 @@ export class SocketClient {
   emitPing(pingId: string) {
     this.socket.emit("PING", { pingId });
   }
-
-  get ping() {
-    return this.pingService.ping;
-  }
 }
 
 export type EmitFunctionProps<T extends EventsToServerKeys> = {
