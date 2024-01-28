@@ -14,7 +14,7 @@ import { INJECTABLE_TYPES } from "../types";
 
 @injectable()
 export class WebSocketService {
-  private io: WebSocketServer<EventsToServer, EventsFromServer>;
+  private readonly _io: WebSocketServer<EventsToServer, EventsFromServer>;
   private players: ClientsService = new ClientsService();
 
   constructor(
@@ -22,18 +22,22 @@ export class WebSocketService {
     @inject(INJECTABLE_TYPES.LobbyService) private readonly lobbyService: LobbyService,
   ) {
     this.lobbyService = lobbyService;
-    this.io = new WebSocketServer<EventsToServer, EventsFromServer>(serverService.server, {
+    this._io = new WebSocketServer<EventsToServer, EventsFromServer>(serverService.server, {
       cors: { origin: "*" },
     });
 
     this.initializeEvents();
   }
 
+  get io() {
+    return this._io;
+  }
+
   private initializeEvents(): void {
-    this.io.on("connection", (socket) => {
+    this._io.on("connection", (socket) => {
       const clientId = socket.handshake.auth.clientId;
       console.log(`Connected WS client ${clientId}`);
-      socket.emit("LOBBY_LIST", this.lobbyService.lobbys);
+      socket.emit("LOBBY_LIST", this.lobbyService.lobbysFlatData);
 
       socket.on("JOIN_LOBBY", async ({ lobbyId }) => {
         try {
@@ -47,7 +51,7 @@ export class WebSocketService {
           socket.emit("ERROR_MESSAGE", { type: ErrorMessageType.GENERAL, message: errorMessage, id: v4() });
         }
 
-        this.io.emit("LOBBY_LIST", this.lobbyService.lobbys);
+        this._io.emit("LOBBY_LIST", this.lobbyService.lobbysFlatData);
       });
 
       socket.on("PING", async (data) => {
@@ -64,7 +68,7 @@ export class WebSocketService {
             hostId: clientId,
           });
           await socket.join(lobbyId);
-          this.io.emit("LOBBY_LIST", this.lobbyService.lobbys);
+          this._io.emit("LOBBY_LIST", this.lobbyService.lobbysFlatData);
           const infoMessage = `You successfully created lobby`;
           socket.emit("INFO_MESSAGE", { type: InfoMessageType.GENERAL, message: infoMessage, id: v4() });
           callback({ lobbyId });
@@ -76,7 +80,7 @@ export class WebSocketService {
       });
 
       socket.on("GET_LOBBY_LIST", () => {
-        socket.emit("LOBBY_LIST", this.lobbyService.lobbys);
+        socket.emit("LOBBY_LIST", this.lobbyService.lobbysFlatData);
       });
     });
   }

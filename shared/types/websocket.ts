@@ -1,4 +1,5 @@
 import { FECreateLobbyProps, ILobby } from "./lobby";
+import { IChatMessage, IChatMessageClient } from "./chat";
 
 export type DisconnectReason =
   | "io server disconnect"
@@ -20,15 +21,6 @@ export interface SocketReservedEvents {
   connect_error: (err: Error) => void;
   disconnect: (reason: DisconnectReason, description?: DisconnectDescription) => void;
 }
-
-export type IChatMessage = {
-  text: string;
-  author: string;
-  timestamp: number;
-  room: string;
-};
-
-export type IChatMessageClient = Pick<IChatMessage, "text" | "author">;
 
 type EventCallback<T> = (props: T) => void;
 type EventCallbackWithCallback<TProps, TResponse> = (
