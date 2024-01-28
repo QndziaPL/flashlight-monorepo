@@ -1,23 +1,76 @@
 import { CreateLobbyProps, ILobby } from "../../../../shared/types/lobby";
-import { v4 as uuid } from "uuid";
-import { injectable } from "inversify";
+import { v4, v4 as uuid } from "uuid";
+import { inject, injectable } from "inversify";
 import { Lobby } from "../../../lobby/Lobby";
 import { arrayFromMap } from "../../../../shared/helpers/arrayFromMap";
+import { IWithIO } from "../../../interfaces/interfaces";
+import {
+  ErrorMessageType,
+  EventsFromServer,
+  EventsToServer,
+  InfoMessageType,
+} from "../../../../shared/types/websocket";
+import { Server } from "socket.io";
+import { INJECTABLE_TYPES } from "../types";
+import { WebSocketService } from "../WebSocketService/WebSocketService";
 
 @injectable()
-// implements IWithIO
-export class LobbyService {
-  // private readonly io: WebSocketServer<EventsToServer, EventsFromServer>;
+export class LobbyService implements IWithIO {
+  private readonly io: Server<EventsToServer, EventsFromServer>;
 
-  // constructor(@inject(INJECTABLE_TYPES.WebSocketService) private readonly webSocketService: WebSocketService) {
-  //   this.io = webSocketService.io;
-  // }
+  constructor(@inject(INJECTABLE_TYPES.WebSocketService) private readonly webSocketService: WebSocketService) {
+    this.io = webSocketService.io;
 
-  // initializeEvents() {
-  //   this.io.on("connection", () => {
-  //     console.log("KONEKSZYN ZAJEBANE Z LOBBYSERVICE");
-  //   });
-  // }
+    this.initializeEvents();
+  }
+
+  //TODO: extract functions to helpers
+  initializeEvents() {
+    this.io.on("connection", (socket) => {
+      const clientId = socket.handshake.auth.clientId;
+      console.log(`InitializeEvents for ${clientId} in LobbyService`);
+      socket.emit("LOBBY_LIST", this.lobbysFlatData);
+
+      socket.on("JOIN_LOBBY", async ({ lobbyId }) => {
+        try {
+          this.joinLobby(lobbyId, clientId);
+          await socket.join(lobbyId);
+          const infoMessage = `Client with id: ${clientId} joined "${lobbyId}" lobby and ws-room with same id`;
+          socket.to(lobbyId).emit("INFO_MESSAGE", { type: InfoMessageType.GENERAL, message: infoMessage, id: v4() });
+        } catch (error) {
+          console.error(error);
+          const errorMessage = error instanceof Error ? error.message : "An unknown error...";
+          socket.emit("ERROR_MESSAGE", { type: ErrorMessageType.GENERAL, message: errorMessage, id: v4() });
+        }
+
+        this.io.emit("LOBBY_LIST", this.lobbysFlatData);
+      });
+
+      socket.on("CREATE_LOBBY", async (data, callback) => {
+        try {
+          const lobbyId = this.createLobby({
+            ...data,
+            clients: [clientId],
+            createdAt: Date.now(),
+            hostId: clientId,
+          });
+          await socket.join(lobbyId);
+          this.io.emit("LOBBY_LIST", this.lobbysFlatData);
+          const infoMessage = `You successfully created lobby`;
+          socket.emit("INFO_MESSAGE", { type: InfoMessageType.GENERAL, message: infoMessage, id: v4() });
+          callback({ lobbyId });
+        } catch (error) {
+          console.error(error);
+          const errorMessage = error instanceof Error ? error.message : "An unknown error...";
+          socket.emit("ERROR_MESSAGE", { type: ErrorMessageType.GENERAL, message: errorMessage, id: v4() });
+        }
+      });
+
+      socket.on("GET_LOBBY_LIST", () => {
+        socket.emit("LOBBY_LIST", this.lobbysFlatData);
+      });
+    });
+  }
 
   private _lobbys: Map<Lobby["id"], Lobby> = new Map();
 
