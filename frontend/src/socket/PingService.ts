@@ -4,7 +4,7 @@ import { SocketClient } from "./Socket.ts";
 const PING_FREQUENCY = 1000;
 
 export class PingService {
-  private intervalId: NodeJS.Timer | null = null;
+  private intervalId: NodeJS.Timer | number | null = null;
   private pingId = "";
   private pingTimestamp = 0;
 
@@ -34,8 +34,8 @@ export class PingService {
   }
 
   cleanup() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId as any);
       this.intervalId = null;
       console.log("Clearing interval in PingService");
     }
