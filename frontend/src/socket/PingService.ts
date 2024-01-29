@@ -1,7 +1,7 @@
 import { v4 } from "uuid";
 import { SocketClient } from "./Socket.ts";
 
-const PING_FREQUENCY = 1000;
+const PING_FREQUENCY = 3000;
 
 export class PingService {
   private intervalId: NodeJS.Timer | number | null = null;
