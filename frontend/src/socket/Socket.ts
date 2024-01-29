@@ -49,6 +49,14 @@ export class SocketClient {
     this.socket.emit("JOIN_LOBBY", { lobbyId });
   }
 
+  sendChatMessage(message: string, lobbyId: string | undefined) {
+    if (!lobbyId) {
+      console.error("No lobbyId, can't send message");
+      return;
+    }
+    this.socket.emit("CHAT_MESSAGE", { message, lobbyId, author: this.clientId });
+  }
+
   async createLobby(data: FECreateLobbyProps): Promise<string> {
     return new Promise((resolve, reject) => {
       this.socket.emit("CREATE_LOBBY", data, (response) => {

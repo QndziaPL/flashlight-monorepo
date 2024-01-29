@@ -7,4 +7,6 @@ export type IChatMessage = {
   author: string;
 };
 
-export type IChatMessageClient = Pick<IChatMessage, "message" | "author">;
+export type IChatMessageClient = Pick<IChatMessage, "message" | "author"> & {
+  lobbyId: string;
+};

@@ -8,6 +8,7 @@ import { SocketIOServer, WebSocketService } from "../WebSocketService/WebSocketS
 import { handleJoinLobby } from "./joinLobby";
 import { handleCreateLobby } from "./createLobby";
 import { handleDeleteLobby } from "./deleteLobby";
+import { handleChatMessage } from "./chatMessage";
 
 @injectable()
 export class LobbyService implements IWithIO {
@@ -30,6 +31,7 @@ export class LobbyService implements IWithIO {
       socket.on("CREATE_LOBBY", async (data, callback) => handleCreateLobby(data, callback, this, clientId, socket));
       socket.on("GET_LOBBY_LIST", () => socket.emit("LOBBY_LIST", this.lobbysFlatData));
       socket.on("DELETE_LOBBY", async ({ lobbyId }) => handleDeleteLobby(lobbyId, clientId, this, socket));
+      socket.on("CHAT_MESSAGE", async (message) => handleChatMessage(message, this, clientId, socket));
     });
   }
 

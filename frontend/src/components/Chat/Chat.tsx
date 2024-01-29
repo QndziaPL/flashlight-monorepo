@@ -1,30 +1,52 @@
-import { FC, useState } from "react";
+import { FC, FormEvent, RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Input } from "../../@/components/ui/input.tsx";
 import { Button } from "../Button.tsx";
 import { IChatMessage } from "../../../../shared/types/chat.ts";
 import { clsx } from "clsx";
+import { useSocket, useSocketSubscription } from "../../context/WebSocketContext.tsx";
+import { useLobby } from "../../context/LobbyContext.tsx";
 
 export const Chat: FC = () => {
-  const [messages, setMessages] = useState<IChatMessage[]>(mockMessages);
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<IChatMessage[]>([]);
+  const [socketMessage] = useSocketSubscription<"CHAT_MESSAGE">({ eventName: "CHAT_MESSAGE" });
+  const { client } = useSocket();
+  const { lobbyId } = useLobby();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (socketMessage) {
+      setMessages((prev) => [...prev, socketMessage]);
+    }
+  }, [socketMessage]);
+
+  useLayoutEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages]);
+
+  const handleSendMessage = (event: FormEvent) => {
+    event.preventDefault();
+    client?.sendChatMessage(message, lobbyId);
+  };
 
   return (
     <div className="w-1/3 absolute left-0 bottom-0">
-      <MessageList messages={messages} />
-      <div className="flex">
+      <MessageList messages={messages} messagesEndRef={messagesEndRef} />
+      <form className="flex" onSubmit={handleSendMessage}>
         <Input id="lobbyName" type="text" value={message} onChange={(e) => setMessage(e.target.value)} />
         <Button type="submit" disabled={message.length < 3}>
           send message
         </Button>
-      </div>
+      </form>
     </div>
   );
 };
 
 type MessageListProps = {
   messages: IChatMessage[];
+  messagesEndRef: RefObject<HTMLDivElement>;
 };
-const MessageList: FC<MessageListProps> = ({ messages }) => {
+const MessageList: FC<MessageListProps> = ({ messages, messagesEndRef }) => {
   const [expanded, setExpanded] = useState(false);
 
   const triggerExpand = () => setExpanded((prev) => !prev);
@@ -33,7 +55,9 @@ const MessageList: FC<MessageListProps> = ({ messages }) => {
       <Button className="w-full text-xs py-0.5 h-auto" variant="ghost" onClick={triggerExpand}>
         {expanded ? "collapse" : "expand"}
       </Button>
-      <div className={clsx("overflow-auto transition-height duration-200", expanded ? "h-80" : "h-20")}>
+      <div
+        className={clsx("transition-height duration-200 overflow-y-auto overflow-x-hidden", expanded ? "h-80" : "h-20")}
+      >
         {messages.map(({ id, message, type, timestamp, author }) => {
           const userMessage = type === "user";
 
@@ -50,80 +74,8 @@ const MessageList: FC<MessageListProps> = ({ messages }) => {
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
       </div>
     </div>
   );
 };
-
-const mockMessages: IChatMessage[] = [
-  {
-    id: "123",
-    message: "Uwaga! kurwa się sprzedała i popruła pod celą, auu",
-    author: "Maria Magdalena",
-    type: "info",
-    timestamp: 1234567,
-  },
-  {
-    id: "234",
-    message: "pizda chuj na ryj kurwie osrany śmieć",
-    author: "Maria Magdalena",
-    type: "user",
-    timestamp: 1234567,
-  },
-  {
-    id: "345",
-    message: "pizda chuj na ryj kurwie osrany śmieć",
-    author: "Maria Magdalena",
-    type: "user",
-    timestamp: 1234567,
-  },
-  {
-    id: "456",
-    message: "Uwaga! kurwa się sprzedała i popruła pod celą, auu",
-    author: "Maria Magdalena",
-    type: "info",
-    timestamp: 1234567,
-  },
-  {
-    id: "567",
-    message: "Uwaga! kurwa się sprzedała i popruła pod celą, auu",
-    author: "Maria Magdalena",
-    type: "info",
-    timestamp: 1234567,
-  },
-  {
-    id: "321",
-    message: "pizda chuj na ryj kurwie osrany śmieć",
-    author: "Maria Magdalena",
-    type: "user",
-    timestamp: 1234567,
-  },
-  {
-    id: "432",
-    message: "pizda chuj na ryj kurwie osrany śmieć",
-    author: "Maria Magdalena",
-    type: "user",
-    timestamp: 1234567,
-  },
-  {
-    id: "543",
-    message: "Uwaga! kurwa się sprzedała i popruła pod celą, auu",
-    author: "Maria Magdalena",
-    type: "info",
-    timestamp: 1234567,
-  },
-  {
-    id: "654",
-    message: "pizda chuj na ryj kurwie osrany śmieć",
-    author: "Maria Magdalena",
-    type: "user",
-    timestamp: 1234567,
-  },
-  {
-    id: "765",
-    message: "Uwaga! kurwa się sprzedała i popruła pod celą, auu",
-    author: "Maria Magdalena",
-    type: "info",
-    timestamp: 1234567,
-  },
-];
