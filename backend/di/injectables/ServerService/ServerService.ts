@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, Request, Response } from "express";
 import http from "http";
 import cors from "cors";
 import { injectable } from "inversify";
@@ -16,6 +16,10 @@ export class ServerService {
 
     this._server = http.createServer(this._app);
     this.listenOnPort();
+
+    this._app.get("/", (req: Request, res: Response) => {
+      res.send("SIEMANEIRO!");
+    });
   }
 
   private listenOnPort() {
