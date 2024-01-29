@@ -1,51 +1,42 @@
-import { FC, FormEvent, useCallback, useEffect, useState } from "react";
+import { FC } from "react";
 import styles from "./LobbyList.module.scss";
-import { Lobby } from "../../../../../shared/types/lobby.ts";
+import { ILobby } from "../../../../../shared/types/lobby.ts";
 
-import { webRTCClient } from "../../../RTC/RTC.ts";
 import { formatTimestamp } from "./helpers.ts";
-import { RTCEventType } from "../../../../../shared/types/rtc.ts";
-import { socket } from "../../../socket/Socket.ts";
-import { ConnectionMode, useAppContext } from "../../../context/AppContext.tsx";
-import { PlayerChatMessage } from "../../../RTC/PlayerChat.ts";
-import { ConnectionStateIndicator } from "../../../components/ConnectionStateIndicator/ConnectionStateIndicator.tsx";
+import { useSocket, useSocketSubscription } from "../../../context/WebSocketContext.tsx";
+import { ProtectedPaths } from "../../../Router/RouterPaths.ts";
+import { useNavigate } from "react-router";
+import { withBackslash } from "../../../Router/helpers.ts";
+import { Button } from "../../../components/Button.tsx";
+import { useLobby } from "../../../context/LobbyContext.tsx";
 
-export type LobbyListProps = {
-  lobbys: Lobby[];
-  deleteLobby: (lobbyId: Lobby["id"]) => Promise<void>;
-  refreshLobby: () => Promise<void>;
-};
-export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobby }) => {
-  const { setMode } = useAppContext();
-  const handleJoinLobby = async (lobbyId: Lobby["id"], offer?: RTCSessionDescriptionInit) => {
-    const answer = await webRTCClient.createAnswer(offer);
-    socket.joinRoom(lobbyId, answer);
+export const LobbyList: FC = () => {
+  const navigate = useNavigate();
+  const socket = useSocket();
+  const { setLobbyId } = useLobby();
+
+  const [lobbys] = useSocketSubscription<"LOBBY_LIST", "GET_LOBBY_LIST">({
+    eventName: "LOBBY_LIST",
+    autoFireEvent: { eventName: "GET_LOBBY_LIST", data: undefined },
+  });
+
+  const handleJoinLobby = async (lobbyId: ILobby["id"]) => {
+    socket.client?.joinLobby(lobbyId);
+    setLobbyId(lobbyId);
+    navigate(withBackslash(ProtectedPaths.LOBBY));
   };
 
-  const [chatMessages, setChatMessages] = useState<PlayerChatMessage[]>([]);
-  const [iceConnectionState, setIceConnectionState] = useState<RTCIceConnectionState>(webRTCClient.iceConnectionState);
-  const [testInputValue, setTestInputValue] = useState("");
-
-  const handleOnRTCChatMessage = useCallback(setChatMessages, []);
-  const handleOnIceConnectionState = useCallback(setIceConnectionState, []);
-  useEffect(() => {
-    webRTCClient.subscribe("chat", handleOnRTCChatMessage);
-    webRTCClient.subscribe("iceConnectionState", handleOnIceConnectionState);
-  }, []);
-
-  const handleSubmitTextMessage = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    webRTCClient.sendMessage(RTCEventType.CHAT, testInputValue);
+  const handleDeleteLobby = async (lobbyId: ILobby["id"]) => {
+    socket.client?.deleteLobby(lobbyId);
   };
 
   return (
     <>
-      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>
-        active lobbys <button onClick={refreshLobby}>refresh</button>
-      </h1>
-      <button onClick={() => setMode(ConnectionMode.HOST)}>host screen</button>
+      <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>active lobbys</h1>
+      <Button className="mb-2" onClick={() => navigate(withBackslash(ProtectedPaths.HOST))}>
+        Create lobby
+      </Button>
       <div className={styles.lobbyList}>
-        <ConnectionStateIndicator state={iceConnectionState} />
         <div className={styles.listHeader}>
           <div>ID</div>
           <div>NAME</div>
@@ -54,35 +45,40 @@ export const LobbyList: FC<LobbyListProps> = ({ lobbys, deleteLobby, refreshLobb
           <div>PLAYERS</div>
           <div>actions</div>
         </div>
-        {lobbys.map((lobby) => (
-          <div key={lobby.id} className={styles.singleLobby}>
-            <div>{lobby.id}</div>
-            <div>{lobby.name}</div>
-            <div>{formatTimestamp(lobby.createdAt)}</div>
-            <div>{lobby.hostId}</div>
-            <div>
-              <ol>
-                {Object.values(lobby.clients).map((clientId) => (
-                  <li key={clientId}>{clientId}</li>
-                ))}
-              </ol>
-            </div>
-            <div>
-              <button onClick={() => handleJoinLobby(lobby.id, lobby.webrtc.offer)}>JOIN</button>
-              <button onClick={() => deleteLobby(lobby.id)}>DELETE</button>
-            </div>
-          </div>
-        ))}
-        <form style={{ margin: 20 }} onSubmit={handleSubmitTextMessage}>
-          <input type="text" value={testInputValue} onChange={(e) => setTestInputValue(e.target.value)} />
-          <button type="submit">SEND MESSAGE VIA WEBRTC</button>
-          <ul>
-            {chatMessages.map((message) => (
-              <li key={message.id}>{message.message}</li>
-            ))}
-          </ul>
-        </form>
+        {lobbys?.length ? (
+          <LobbyListContent lobbys={lobbys} handleJoinLobby={handleJoinLobby} handleDeleteLobby={handleDeleteLobby} />
+        ) : (
+          <NoLobbysContent />
+        )}
       </div>
     </>
   );
 };
+
+const NoLobbysContent = () => <div className="text-center">No lobbys! Let's create a new one!</div>;
+
+type LobbyListContentProps = {
+  lobbys: ILobby[];
+  handleJoinLobby: (lobbyId: string) => void;
+  handleDeleteLobby: (lobbyId: string) => void;
+};
+const LobbyListContent: FC<LobbyListContentProps> = ({ lobbys, handleJoinLobby, handleDeleteLobby }) =>
+  lobbys.map((lobby) => (
+    <div key={lobby.id} className={styles.singleLobby}>
+      <div>{lobby.id}</div>
+      <div>{lobby.name}</div>
+      <div>{formatTimestamp(lobby.createdAt)}</div>
+      <div>{lobby.hostId}</div>
+      <div>
+        <ol>
+          {Object.values(lobby.clients).map((clientId) => (
+            <li key={clientId}>{clientId}</li>
+          ))}
+        </ol>
+      </div>
+      <div>
+        <Button onClick={() => handleJoinLobby(lobby.id)}>JOIN</Button>
+        <Button onClick={() => handleDeleteLobby(lobby.id)}>DELETE</Button>
+      </div>
+    </div>
+  ));

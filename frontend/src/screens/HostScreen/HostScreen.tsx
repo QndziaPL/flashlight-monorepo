@@ -1,35 +1,47 @@
-import { FC, useState } from "react";
+import { FC, FormEvent, useState } from "react";
 import { useIpAddress } from "../../hooks/useIpAddress.ts";
-import { ConnectionMode, useAppContext } from "../../context/AppContext.tsx";
 import { FECreateLobbyProps } from "../../../../shared/types/lobby.ts";
-import { useApi } from "../../hooks/useApi.ts";
-import { webRTCClient } from "../../RTC/RTC.ts";
-import { socket } from "../../socket/Socket.ts";
+import { useSocket } from "../../context/WebSocketContext.tsx";
+import { useNavigate } from "react-router";
+import { ProtectedPaths } from "../../Router/RouterPaths.ts";
+import { withBackslash } from "../../Router/helpers.ts";
+import { Button } from "../../components/Button.tsx";
+import { Input } from "../../@/components/ui/input.tsx";
+import { Label } from "../../@/components/ui/label.tsx";
+import { useLobby } from "../../context/LobbyContext.tsx";
+import { useToasts } from "../../context/ToastContext.tsx";
+import { v4 } from "uuid";
 
 export type HostScreenProps = {};
 export const HostScreen: FC<HostScreenProps> = () => {
   const { ip, error, loading } = useIpAddress();
-  const { setMode, clientId } = useAppContext();
+
+  const socket = useSocket();
+  const navigate = useNavigate();
+  const { addToast } = useToasts();
+  const { setLobbyId } = useLobby();
 
   const [lobbyName, setLobbyName] = useState<string>("");
 
-  const createLobbyAPI = useApi<{ lobbyId: string }>();
-
-  const handleCreateLobby = async () => {
-    const offer = await webRTCClient.createOffer();
+  const handleCreateLobby = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     const createLobbyData: FECreateLobbyProps = {
       name: lobbyName,
-      hostId: clientId,
-      webrtc: {
-        offer,
-      },
     };
-
-    const data = await createLobbyAPI.call("/lobbys", { method: "POST", body: JSON.stringify(createLobbyData) });
-
-    if (data.lobbyId) {
-      socket.joinRoom(data.lobbyId);
-      setMode(ConnectionMode.JOIN);
+    try {
+      const lobbyId = await socket.client?.createLobby(createLobbyData);
+      if (lobbyId) {
+        setLobbyId(lobbyId);
+        navigate(withBackslash(ProtectedPaths.LOBBY));
+      }
+    } catch (error) {
+      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error during creation of lobby";
+      addToast({
+        id: v4(),
+        type: "error",
+        message: errorMessage,
+      });
     }
   };
 
@@ -44,12 +56,16 @@ export const HostScreen: FC<HostScreenProps> = () => {
         </p>
       )}
       <hr />
+      <form onSubmit={handleCreateLobby}>
+        <Label htmlFor="lobbyName">Lobby name</Label>
 
-      <input type="text" value={lobbyName} onChange={(e) => setLobbyName(e.target.value)} />
-      <button onClick={handleCreateLobby} disabled={lobbyName.length < 3}>
-        create lobby
-      </button>
-      <button onClick={() => setMode(ConnectionMode.NOT_SELECTED)}>back to main menu</button>
+        <div className="flex">
+          <Input id="lobbyName" type="text" value={lobbyName} onChange={(e) => setLobbyName(e.target.value)} />
+          <Button type="submit" disabled={lobbyName.length < 3}>
+            create lobby
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };

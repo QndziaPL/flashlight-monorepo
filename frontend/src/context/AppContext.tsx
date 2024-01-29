@@ -1,7 +1,6 @@
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 import { useStorage } from "../hooks/useStorage/useStorage.ts";
 import { v4 as uuid } from "uuid";
-import { socket } from "../socket/Socket.ts";
 
 export type AppContextProps = {
   mode: ConnectionMode | undefined;
@@ -26,10 +25,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [hosted, setHosted] = useState(false);
 
   const [clientId] = useStorage("clientId", uuid(), "local");
-
-  useEffect(() => {
-    socket.setClientId(clientId);
-  }, [clientId]);
+  // const []
 
   return <AppContext.Provider value={{ mode, setMode, hosted, setHosted, clientId }}>{children}</AppContext.Provider>;
 };
