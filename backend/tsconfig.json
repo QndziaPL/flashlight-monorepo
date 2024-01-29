@@ -17,7 +17,8 @@
     "skipLibCheck": true,
     /* Skip type checking all .d.ts files. */
     "types": [
-      "reflect-metadata"
+      "reflect-metadata",
+      "jest"
     ],
     "moduleResolution": "node",
     "experimentalDecorators": true,
