@@ -43,6 +43,9 @@ export type EventsToServer = {
   PING: EventCallback<{
     pingId: string;
   }>;
+  DELETE_LOBBY: EventCallback<{
+    lobbyId: string;
+  }>;
 } & SocketReservedEvents;
 
 export type EventsToServerKeys = keyof EventsToServer;
@@ -51,6 +54,9 @@ export type EventsFromServer = {
   CHAT_MESSAGE: EventCallback<IChatMessage>;
   INFO_MESSAGE: EventCallback<InfoMessage>;
   LOBBY_LIST: EventCallback<ILobby[]>;
+  LOBBY_DELETED: EventCallback<{
+    lobbyId: string;
+  }>;
   ERROR_MESSAGE: EventCallback<ErrorMesssage>;
   PONG: EventCallback<{
     pongId: string;

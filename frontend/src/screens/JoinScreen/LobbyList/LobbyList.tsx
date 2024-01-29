@@ -26,6 +26,10 @@ export const LobbyList: FC = () => {
     navigate(withBackslash(ProtectedPaths.LOBBY));
   };
 
+  const handleDeleteLobby = async (lobbyId: ILobby["id"]) => {
+    socket.client?.deleteLobby(lobbyId);
+  };
+
   return (
     <>
       <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>active lobbys</h1>
@@ -41,7 +45,11 @@ export const LobbyList: FC = () => {
           <div>PLAYERS</div>
           <div>actions</div>
         </div>
-        {lobbys?.length ? <LobbyListContent lobbys={lobbys} handleJoinLobby={handleJoinLobby} /> : <NoLobbysContent />}
+        {lobbys?.length ? (
+          <LobbyListContent lobbys={lobbys} handleJoinLobby={handleJoinLobby} handleDeleteLobby={handleDeleteLobby} />
+        ) : (
+          <NoLobbysContent />
+        )}
       </div>
     </>
   );
@@ -52,8 +60,9 @@ const NoLobbysContent = () => <div className="text-center">No lobbys! Let's crea
 type LobbyListContentProps = {
   lobbys: ILobby[];
   handleJoinLobby: (lobbyId: string) => void;
+  handleDeleteLobby: (lobbyId: string) => void;
 };
-const LobbyListContent: FC<LobbyListContentProps> = ({ lobbys, handleJoinLobby }) =>
+const LobbyListContent: FC<LobbyListContentProps> = ({ lobbys, handleJoinLobby, handleDeleteLobby }) =>
   lobbys.map((lobby) => (
     <div key={lobby.id} className={styles.singleLobby}>
       <div>{lobby.id}</div>
@@ -69,7 +78,7 @@ const LobbyListContent: FC<LobbyListContentProps> = ({ lobbys, handleJoinLobby }
       </div>
       <div>
         <Button onClick={() => handleJoinLobby(lobby.id)}>JOIN</Button>
-        {/*<button onClick={() => deleteLobby(lobby.id)}>DELETE</button>*/}
+        <Button onClick={() => handleDeleteLobby(lobby.id)}>DELETE</Button>
       </div>
     </div>
   ));

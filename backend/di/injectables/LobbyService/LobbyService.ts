@@ -7,6 +7,7 @@ import { INJECTABLE_TYPES } from "../types";
 import { SocketIOServer, WebSocketService } from "../WebSocketService/WebSocketService";
 import { handleJoinLobby } from "./joinLobby";
 import { handleCreateLobby } from "./createLobby";
+import { handleDeleteLobby } from "./deleteLobby";
 
 @injectable()
 export class LobbyService implements IWithIO {
@@ -28,6 +29,7 @@ export class LobbyService implements IWithIO {
       socket.on("JOIN_LOBBY", ({ lobbyId }) => handleJoinLobby(lobbyId, clientId, this, socket));
       socket.on("CREATE_LOBBY", async (data, callback) => handleCreateLobby(data, callback, this, clientId, socket));
       socket.on("GET_LOBBY_LIST", () => socket.emit("LOBBY_LIST", this.lobbysFlatData));
+      socket.on("DELETE_LOBBY", async ({ lobbyId }) => handleDeleteLobby(lobbyId, clientId, this, socket));
     });
   }
 
