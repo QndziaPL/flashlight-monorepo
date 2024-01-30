@@ -12,6 +12,7 @@ type LobbyContextProviderProps = {
 };
 export const LobbyContextProvider: FC<LobbyContextProviderProps> = ({ children }) => {
   const [deletedLobby] = useSocketSubscription<"LOBBY_DELETED">({ eventName: "LOBBY_DELETED" });
+  const [lobbyLeft] = useSocketSubscription<"LOBBY_LEFT">({ eventName: "LOBBY_LEFT" });
   const [lobbyId, setLobbyId] = useState<string | undefined>();
 
   useEffect(() => {
@@ -19,6 +20,12 @@ export const LobbyContextProvider: FC<LobbyContextProviderProps> = ({ children }
       setLobbyId(undefined);
     }
   }, [deletedLobby]);
+
+  useEffect(() => {
+    if (lobbyLeft?.lobbyId && lobbyLeft.lobbyId === lobbyId) {
+      setLobbyId(undefined);
+    }
+  }, [lobbyLeft]);
 
   return <LobbyContext.Provider value={{ lobbyId, setLobbyId }}>{children}</LobbyContext.Provider>;
 };

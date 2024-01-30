@@ -4,11 +4,12 @@ import { Lobby } from "../../../lobby/Lobby";
 import { arrayFromMap } from "../../../../shared/helpers/arrayFromMap";
 import { IWithIO } from "../../../interfaces/interfaces";
 import { INJECTABLE_TYPES } from "../types";
-import { SocketIOServer, WebSocketService } from "../WebSocketService/WebSocketService";
+import { Socket, SocketIOServer, WebSocketService } from "../WebSocketService/WebSocketService";
 import { handleJoinLobby } from "./joinLobby";
 import { handleCreateLobby } from "./createLobby";
 import { handleDeleteLobby } from "./deleteLobby";
 import { handleChatMessage } from "./chatMessage";
+import { handleLeaveLobby } from "./leaveLobby";
 
 @injectable()
 export class LobbyService implements IWithIO {
@@ -28,9 +29,10 @@ export class LobbyService implements IWithIO {
       socket.emit("LOBBY_LIST", this.lobbysFlatData);
 
       socket.on("JOIN_LOBBY", ({ lobbyId }) => handleJoinLobby(lobbyId, clientId, this, socket));
+      socket.on("LEAVE_LOBBY", ({ lobbyId }) => handleLeaveLobby(lobbyId, clientId, this, socket));
       socket.on("CREATE_LOBBY", async (data, callback) => handleCreateLobby(data, callback, this, clientId, socket));
       socket.on("GET_LOBBY_LIST", () => socket.emit("LOBBY_LIST", this.lobbysFlatData));
-      socket.on("DELETE_LOBBY", async ({ lobbyId }) => handleDeleteLobby(lobbyId, clientId, this, socket));
+      socket.on("DELETE_LOBBY", async ({ lobbyId }) => this.deleteLobby(lobbyId, clientId, socket));
       socket.on("CHAT_MESSAGE", async (message) => handleChatMessage(message, this, clientId, socket));
     });
   }
@@ -39,8 +41,16 @@ export class LobbyService implements IWithIO {
     return this._io;
   }
 
-  getLobbyById(lobbyId: string): Lobby | undefined {
-    return this._lobbys.get(lobbyId);
+  deleteLobby(lobbyId: string, clientId: string, socket: Socket) {
+    handleDeleteLobby(lobbyId, clientId, this, socket);
+  }
+
+  getLobbyById(lobbyId: string): Lobby {
+    const lobby = this._lobbys.get(lobbyId);
+    if (!lobby) {
+      throw Error(`Couldn't find lobby with id ${lobbyId}`);
+    }
+    return lobby;
   }
 
   emitLobbyList() {
@@ -57,9 +67,5 @@ export class LobbyService implements IWithIO {
 
   public addLobby(lobby: Lobby) {
     this._lobbys.set(lobby["id"], lobby);
-  }
-
-  public deleteLobby(id: ILobby["id"]) {
-    // this._lobbys = this._lobbys.filter((lobby) => lobby.id !== id);
   }
 }

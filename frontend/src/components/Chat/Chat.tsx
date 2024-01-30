@@ -5,6 +5,7 @@ import { IChatMessage } from "../../../../shared/types/chat.ts";
 import { clsx } from "clsx";
 import { useSocket, useSocketSubscription } from "../../context/WebSocketContext.tsx";
 import { useLobby } from "../../context/LobbyContext.tsx";
+import "./Chat.scss";
 
 export const Chat: FC = () => {
   const [message, setMessage] = useState("");
@@ -30,7 +31,7 @@ export const Chat: FC = () => {
   };
 
   return (
-    <div className="w-1/3 absolute left-0 bottom-0">
+    <div className="absolute left-0 bottom-0 w-full max-w-[600px]">
       <MessageList messages={messages} messagesEndRef={messagesEndRef} />
       <form className="flex" onSubmit={handleSendMessage}>
         <Input id="lobbyName" type="text" value={message} onChange={(e) => setMessage(e.target.value)} />
@@ -62,7 +63,7 @@ const MessageList: FC<MessageListProps> = ({ messages, messagesEndRef }) => {
           const userMessage = type === "user";
 
           return (
-            <div key={id}>
+            <div key={id} className="break-words whitespace-normal">
               <span>
                 [<span className="mr-1 text-xs">{timestamp}</span>
                 <span className={clsx(userMessage ? "text-green-600" : "text-red-700")}>

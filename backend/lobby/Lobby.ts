@@ -9,7 +9,7 @@ export class Lobby {
     private readonly _id: string,
     private _name: string,
     private readonly _hostId: string,
-    private readonly _clients: string[],
+    private _clients: string[],
     private readonly _createdAt: number,
   ) {}
 
@@ -58,5 +58,9 @@ export class Lobby {
 
   addClient(clientId: string) {
     this._clients.push(clientId);
+  }
+
+  removeClient(clientId: string) {
+    this._clients = this._clients.filter((client) => client !== clientId);
   }
 }

@@ -12,9 +12,6 @@ export const handleChatMessage = async (
 ) => {
   try {
     const lobby = lobbyService.getLobbyById(message.lobbyId);
-    if (!lobby) {
-      throw Error(`Couldn't find lobby with id ${message.lobbyId}`);
-    }
     const newMessage = lobby.addMessage(message, clientId);
     console.log(lobby.flatData.id, message.lobbyId);
     const poszlo = lobbyService.io.to(lobby.flatData.id).emit("CHAT_MESSAGE", newMessage);

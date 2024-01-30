@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import { withBackslash } from "../../../Router/helpers.ts";
 import { Button } from "../../../components/Button.tsx";
 import { useLobby } from "../../../context/LobbyContext.tsx";
+import { useAuth } from "../../../context/AuthContext.tsx";
 
 export const LobbyList: FC = () => {
   const navigate = useNavigate();
@@ -30,6 +31,10 @@ export const LobbyList: FC = () => {
     socket.client?.deleteLobby(lobbyId);
   };
 
+  const handleLeaveLobby = async (lobbyId: ILobby["id"]) => {
+    socket.client?.leaveLobby(lobbyId);
+  };
+
   return (
     <>
       <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>active lobbys</h1>
@@ -46,7 +51,12 @@ export const LobbyList: FC = () => {
           <div>actions</div>
         </div>
         {lobbys?.length ? (
-          <LobbyListContent lobbys={lobbys} handleJoinLobby={handleJoinLobby} handleDeleteLobby={handleDeleteLobby} />
+          <LobbyListContent
+            lobbys={lobbys}
+            handleJoinLobby={handleJoinLobby}
+            handleLeaveLobby={handleLeaveLobby}
+            handleDeleteLobby={handleDeleteLobby}
+          />
         ) : (
           <NoLobbysContent />
         )}
@@ -61,9 +71,21 @@ type LobbyListContentProps = {
   lobbys: ILobby[];
   handleJoinLobby: (lobbyId: string) => void;
   handleDeleteLobby: (lobbyId: string) => void;
+  handleLeaveLobby: (lobbyId: string) => void;
 };
-const LobbyListContent: FC<LobbyListContentProps> = ({ lobbys, handleJoinLobby, handleDeleteLobby }) =>
-  lobbys.map((lobby) => (
+const LobbyListContent: FC<LobbyListContentProps> = ({
+  lobbys,
+  handleJoinLobby,
+  handleDeleteLobby,
+  handleLeaveLobby,
+}) => {
+  const { user } = useAuth();
+  const checkIfClientIsMemberOfTheLobby = (clients: ILobby["clients"]) => {
+    if (!user) throw Error("Ooops! You are not authorised! This should never happen!");
+    return clients.includes(user?.uid);
+  };
+
+  return lobbys.map((lobby) => (
     <div key={lobby.id} className={styles.singleLobby}>
       <div>{lobby.id}</div>
       <div>{lobby.name}</div>
@@ -78,7 +100,11 @@ const LobbyListContent: FC<LobbyListContentProps> = ({ lobbys, handleJoinLobby, 
       </div>
       <div>
         <Button onClick={() => handleJoinLobby(lobby.id)}>JOIN</Button>
+        {checkIfClientIsMemberOfTheLobby(lobby.clients) && (
+          <Button onClick={() => handleLeaveLobby(lobby.id)}>LEAVE</Button>
+        )}
         <Button onClick={() => handleDeleteLobby(lobby.id)}>DELETE</Button>
       </div>
     </div>
   ));
+};

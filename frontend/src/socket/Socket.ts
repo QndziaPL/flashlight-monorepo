@@ -73,6 +73,10 @@ export class SocketClient {
     this.socket.emit("DELETE_LOBBY", { lobbyId });
   }
 
+  leaveLobby(lobbyId: string) {
+    this.socket.emit("LEAVE_LOBBY", { lobbyId });
+  }
+
   setClientId(clientId: string) {
     console.log("Setting clientId for client socket instance");
     this.clientId = clientId;

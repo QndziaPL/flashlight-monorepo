@@ -33,6 +33,9 @@ export type EventsToServer = {
   JOIN_LOBBY: EventCallback<{
     lobbyId: string;
   }>;
+  LEAVE_LOBBY: EventCallback<{
+    lobbyId: string;
+  }>;
   CREATE_LOBBY: EventCallbackWithCallback<
     FECreateLobbyProps,
     {
@@ -55,6 +58,9 @@ export type EventsFromServer = {
   INFO_MESSAGE: EventCallback<InfoMessage>;
   LOBBY_LIST: EventCallback<ILobby[]>;
   LOBBY_DELETED: EventCallback<{
+    lobbyId: string;
+  }>;
+  LOBBY_LEFT: EventCallback<{
     lobbyId: string;
   }>;
   ERROR_MESSAGE: EventCallback<ErrorMesssage>;

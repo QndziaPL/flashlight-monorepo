@@ -24,9 +24,6 @@ export const handleDeleteLobby = async (
 
 const deleteLobby = (lobbyId: string, clientId: string, lobbyService: LobbyService) => {
   const lobby = lobbyService.getLobbyById(lobbyId);
-  if (!lobby) {
-    throw Error(`No lobby with id ${lobbyId}`);
-  }
   if (lobby.flatData.hostId !== clientId) {
     throw Error(`Client ${clientId} has no access to delete this lobby`);
   }

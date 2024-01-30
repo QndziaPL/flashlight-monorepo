@@ -24,9 +24,6 @@ export const handleJoinLobby = async (
 
 const joinLobby = (lobbyId: string, clientId: string, lobbyService: LobbyService) => {
   const lobby = lobbyService.getLobbyById(lobbyId);
-  if (!lobby) {
-    throw Error(`Couldn't find lobby with id ${lobbyId}`);
-  }
   if (lobby.clients.includes(clientId)) {
     throw Error(`Client with id ${clientId} is already on client list in ${lobbyId} lobby`);
   }
