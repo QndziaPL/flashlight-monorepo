@@ -42,7 +42,10 @@ jobs:
         run: echo "No tests yet, TBD"
 
       - name: Zip artifact for deployment
-        run: zip -r release.zip backend
+        run: |
+          cd backend 
+          zip -r ../release.zip dist node_modules
+
 
       - name: Zip size
         run: stat -c%s release.zip
