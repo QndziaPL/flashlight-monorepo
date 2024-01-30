@@ -72,12 +72,12 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      - name: Clean wwwroot directory in Azure Web App
+      - name: Clean wwwroot directory in Azure Web App via Kudu API
         run: |
-          az webapp ssh --resource-group flashlight --name flashlight --command "rm -rf /home/site/wwwroot/*"
+          curl -X POST -u ${{ secrets.KUDU_USERNAME }}:${{ secrets.KUDU_PASSWORD }} https://flashlight.scm.azurewebsites.net/api/command -d '{"command": "rm -rf /home/site/wwwroot/*", "dir": "site\\wwwroot"}' -H 'Content-Type: application/json'
           env:
-            AZURE_HTTP_USER_AGENT: ${{ secrets.AZURE_HTTP_USER_AGENT }}
-            AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+          KUDU_USERNAME: ${{ secrets.KUDU_USERNAME }}
+          KUDU_PASSWORD: ${{ secrets.KUDU_PASSWORD }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
