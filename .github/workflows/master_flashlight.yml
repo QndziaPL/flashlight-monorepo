@@ -74,10 +74,12 @@ jobs:
 
       - name: Clean wwwroot directory in Azure Web App via Kudu API
         run: |
-          curl -X POST -u ${{ secrets.KUDU_USERNAME }}:${{ secrets.KUDU_PASSWORD }} https://flashlight.scm.azurewebsites.net/api/command -d '{"command": "rm -rf /home/site/wwwroot/*", "dir": "site\\wwwroot"}' -H 'Content-Type: application/json'
-          env:
-          KUDU_USERNAME: ${{ secrets.KUDU_USERNAME }}
-          KUDU_PASSWORD: ${{ secrets.KUDU_PASSWORD }}
+          curl -X POST \
+          -u ${{ secrets.KUDU_USERNAME }}:${{ secrets.KUDU_PASSWORD }} \
+          "https://flashlight.scm.azurewebsites.net/api/command" \
+          -H "Content-Type: application/json" \
+          -d '{"command": "rm -rf /home/site/wwwroot/*", "dir": "site/wwwroot"}'
+
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
