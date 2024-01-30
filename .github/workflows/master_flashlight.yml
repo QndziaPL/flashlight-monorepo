@@ -31,11 +31,11 @@ jobs:
           rm -rf node_modules
 
       - name: Install backend dependencies
-        run: npm install
+        run: npm install --filter ./backend/..
         working-directory: backend
 
       - name: Compile typescript backend
-        run: npm run build
+        run: npm run build --filter ./backend/..
         working-directory: backend
 
       - name: Run backend tests
