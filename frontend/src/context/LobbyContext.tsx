@@ -15,6 +15,8 @@ export const LobbyContextProvider: FC<LobbyContextProviderProps> = ({ children }
   const [lobbyLeft] = useSocketSubscription<"LOBBY_LEFT">({ eventName: "LOBBY_LEFT" });
   const [lobbyId, setLobbyId] = useState<string | undefined>();
 
+  console.log(lobbyId, "LOBBY_ID");
+
   useEffect(() => {
     if (deletedLobby?.lobbyId && deletedLobby.lobbyId === lobbyId) {
       setLobbyId(undefined);

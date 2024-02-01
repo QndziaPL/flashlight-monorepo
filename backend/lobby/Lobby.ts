@@ -8,7 +8,7 @@ export class Lobby {
   constructor(
     private readonly _id: string,
     private _name: string,
-    private readonly _hostId: string,
+    private _hostId: string,
     private _clients: string[],
     private readonly _createdAt: number,
   ) {}
@@ -62,5 +62,13 @@ export class Lobby {
 
   removeClient(clientId: string) {
     this._clients = this._clients.filter((client) => client !== clientId);
+
+    if (clientId === this._hostId && this._clients.length) {
+      this.setHost(this._clients[0]);
+    }
+  }
+
+  setHost(clientId: string) {
+    this._hostId = clientId;
   }
 }
