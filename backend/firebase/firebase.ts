@@ -2,7 +2,7 @@ import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
 import dotenv from "dotenv";
 import { addDoc, collection, deleteDoc, doc, Firestore, getDocs, getFirestore } from "firebase/firestore";
 import { removeKeysWithUndefinedValues } from "../../shared/helpers/mappers";
-import { CreateLobbyProps, ILobby } from "../../shared/types/lobby";
+import { CreateLobbyProps, LobbyDTO } from "../../shared/types/lobby";
 
 dotenv.config();
 
@@ -71,7 +71,7 @@ export class FirebaseClient {
     }
   }
 
-  async deleteLobby(lobbyId: ILobby["id"]) {
+  async deleteLobby(lobbyId: LobbyDTO["id"]) {
     try {
       const lobbyRef = doc(this._db, "lobbys", lobbyId);
       await deleteDoc(lobbyRef);

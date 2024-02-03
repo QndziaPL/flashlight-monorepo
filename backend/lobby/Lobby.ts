@@ -1,4 +1,4 @@
-import { ILobby } from "../../shared/types/lobby";
+import { LobbyDTO } from "../../shared/types/lobby";
 import { IChatMessage, IChatMessageClient } from "../../shared/types/chat";
 import { v4 } from "uuid";
 
@@ -25,7 +25,7 @@ export class Lobby {
     return this._id;
   }
 
-  get flatData(): ILobby {
+  get getDto(): LobbyDTO {
     return {
       id: this._id,
       hostId: this._hostId,

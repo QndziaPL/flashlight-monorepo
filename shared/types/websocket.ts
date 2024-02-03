@@ -1,4 +1,4 @@
-import { FECreateLobbyProps, ILobby } from "./lobby";
+import { FECreateLobbyProps, LobbyDTO } from "./lobby";
 import { IChatMessage, IChatMessageClient } from "./chat";
 
 export type DisconnectReason =
@@ -56,7 +56,7 @@ export type EventsToServerKeys = keyof EventsToServer;
 export type EventsFromServer = {
   CHAT_MESSAGE: EventCallback<IChatMessage>;
   INFO_MESSAGE: EventCallback<InfoMessage>;
-  LOBBY_LIST: EventCallback<ILobby[]>;
+  LOBBY_LIST: EventCallback<LobbyDTO[]>;
   LOBBY_DELETED: EventCallback<{
     lobbyId: string;
   }>;

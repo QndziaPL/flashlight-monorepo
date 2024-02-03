@@ -2,15 +2,16 @@ import { ErrorMessageType, InfoMessageType } from "../../../../shared/types/webs
 import { v4 as uuid, v4 } from "uuid";
 import { CreateLobbyProps, FECreateLobbyProps } from "../../../../shared/types/lobby";
 import { Lobby } from "../../../lobby/Lobby";
-import { LobbyService } from "./LobbyService";
 import { Socket } from "../WebSocketService/WebSocketService";
+import { LobbyRepository } from "../../../repositories/LobbyRepository";
 
 export const handleCreateLobby = async (
   lobbyData: FECreateLobbyProps,
   callback: (data: { lobbyId: string }) => void,
-  lobbyService: LobbyService,
+  lobbyRepository: LobbyRepository,
   clientId: string,
   socket: Socket,
+  emitLobbyList: () => void,
 ) => {
   try {
     const lobbyId = createLobby(
@@ -20,10 +21,10 @@ export const handleCreateLobby = async (
         createdAt: Date.now(),
         hostId: clientId,
       },
-      lobbyService,
+      lobbyRepository,
     );
     await socket.join(lobbyId);
-    lobbyService.io.emit("LOBBY_LIST", lobbyService.lobbysFlatData);
+    emitLobbyList();
     const infoMessage = `You successfully created lobby`;
     socket.emit("INFO_MESSAGE", { type: InfoMessageType.GENERAL, message: infoMessage, id: v4() });
     callback({ lobbyId });
@@ -34,12 +35,12 @@ export const handleCreateLobby = async (
   }
 };
 
-const createLobby = (data: CreateLobbyProps, lobbyService: LobbyService) => {
-  if (lobbyService.lobbysFlatData.some((lobby) => lobby.clients.includes(data.hostId))) {
+const createLobby = (data: CreateLobbyProps, lobbyRepository: LobbyRepository) => {
+  if (lobbyRepository.getAll().some((lobby) => lobby.clients.includes(data.hostId))) {
     throw Error(`Couldn't create lobby. Client ${data.hostId} is already part of an other lobby`);
   }
   const id = uuid();
   const newLobby = new Lobby(id, data.name, data.hostId, data.clients, data.createdAt);
-  lobbyService.addLobby(newLobby);
+  lobbyRepository.add(id, newLobby);
   return id;
 };

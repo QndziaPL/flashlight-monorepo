@@ -1,20 +1,28 @@
-import { LobbyService } from "./LobbyService";
-import { Socket } from "../WebSocketService/WebSocketService";
+import { Socket, SocketIOServer } from "../WebSocketService/WebSocketService";
 import { ErrorMessageType, InfoMessageType } from "../../../../shared/types/websocket";
 import { v4 } from "uuid";
 import { closeSocketRoom } from "../WebSocketService/closeSocketRoom";
+import { LobbyRepository } from "../../../repositories/LobbyRepository";
 
-export const handleLeaveLobby = (lobbyId: string, clientId: string, lobbyService: LobbyService, socket: Socket) => {
+export const handleLeaveLobby = (
+  lobbyId: string,
+  clientId: string,
+  lobbyRepository: LobbyRepository,
+  socket: Socket,
+  deleteLobby: (lobbyId: string, clientId: string, socket: Socket, io: SocketIOServer) => void,
+  io: SocketIOServer,
+  emitLobbyList: () => void,
+) => {
   try {
-    const lobby = leaveLobby(lobbyId, clientId, lobbyService);
+    const lobby = leaveLobby(lobbyId, clientId, lobbyRepository);
     if (!lobby.clients.length) {
-      lobbyService.deleteLobby(lobbyId, clientId, socket);
+      deleteLobby(lobbyId, clientId, socket, io);
       return;
     }
-    const infoMessage = `Player ${clientId} left "${lobbyService.getLobbyById(lobbyId).flatData.name}" lobby`;
+    const infoMessage = `Player ${clientId} left "${lobbyRepository.getById(lobbyId)?.getDto.name}" lobby`;
     socket.to(lobbyId).emit("INFO_MESSAGE", { type: InfoMessageType.GENERAL, message: infoMessage, id: v4() });
-    closeSocketRoom(lobbyService.io, lobbyId, socket.id);
-    lobbyService.emitLobbyList();
+    closeSocketRoom(io, lobbyId, socket.id);
+    emitLobbyList();
     socket.emit("LOBBY_LEFT", { lobbyId });
   } catch (error) {
     console.error(error);
@@ -23,8 +31,11 @@ export const handleLeaveLobby = (lobbyId: string, clientId: string, lobbyService
   }
 };
 
-const leaveLobby = (lobbyId: string, clientId: string, lobbyService: LobbyService) => {
-  const lobby = lobbyService.getLobbyById(lobbyId);
+const leaveLobby = (lobbyId: string, clientId: string, lobbyRepository: LobbyRepository) => {
+  const lobby = lobbyRepository.getById(lobbyId);
+  if (!lobby) {
+    throw Error(`Couldn't find lobby with id ${lobbyId}`);
+  }
   if (!lobby.clients.includes(clientId)) {
     throw Error(`We couldn't find you in this lobby`);
   }

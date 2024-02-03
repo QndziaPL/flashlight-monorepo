@@ -1,6 +1,6 @@
 import { FC } from "react";
 import styles from "./LobbyList.module.scss";
-import { ILobby } from "../../../../../shared/types/lobby.ts";
+import { LobbyDTO } from "../../../../../shared/types/lobby.ts";
 
 import { formatTimestamp } from "./helpers.ts";
 import { useSocket, useSocketSubscription } from "../../../context/WebSocketContext.tsx";
@@ -21,17 +21,17 @@ export const LobbyList: FC = () => {
     autoFireEvent: { eventName: "GET_LOBBY_LIST", data: undefined },
   });
 
-  const handleJoinLobby = async (lobbyId: ILobby["id"]) => {
+  const handleJoinLobby = async (lobbyId: LobbyDTO["id"]) => {
     socket.client?.joinLobby(lobbyId);
     setLobbyId(lobbyId);
     navigate(withBackslash(ProtectedPaths.LOBBY));
   };
 
-  const handleDeleteLobby = async (lobbyId: ILobby["id"]) => {
+  const handleDeleteLobby = async (lobbyId: LobbyDTO["id"]) => {
     socket.client?.deleteLobby(lobbyId);
   };
 
-  const handleLeaveLobby = async (lobbyId: ILobby["id"]) => {
+  const handleLeaveLobby = async (lobbyId: LobbyDTO["id"]) => {
     socket.client?.leaveLobby(lobbyId);
   };
 
@@ -68,7 +68,7 @@ export const LobbyList: FC = () => {
 const NoLobbysContent = () => <div className="text-center">No lobbys! Let's create a new one!</div>;
 
 type LobbyListContentProps = {
-  lobbys: ILobby[];
+  lobbys: LobbyDTO[];
   handleJoinLobby: (lobbyId: string) => void;
   handleDeleteLobby: (lobbyId: string) => void;
   handleLeaveLobby: (lobbyId: string) => void;
@@ -80,7 +80,7 @@ const LobbyListContent: FC<LobbyListContentProps> = ({
   handleLeaveLobby,
 }) => {
   const { user } = useAuth();
-  const checkIfClientIsMemberOfTheLobby = (clients: ILobby["clients"]) => {
+  const checkIfClientIsMemberOfTheLobby = (clients: LobbyDTO["clients"]) => {
     if (!user) throw Error("Ooops! You are not authorised! This should never happen!");
     return clients.includes(user?.uid);
   };

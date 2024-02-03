@@ -1,4 +1,4 @@
-export type ILobby = {
+export type LobbyDTO = {
   id: string;
   name: string;
   hostId: string;
@@ -6,5 +6,5 @@ export type ILobby = {
   createdAt: number;
 };
 
-export type CreateLobbyProps = Omit<ILobby, "id">;
+export type CreateLobbyProps = Omit<LobbyDTO, "id">;
 export type FECreateLobbyProps = Omit<CreateLobbyProps, "clients" | "createdAt" | "hostId">;
