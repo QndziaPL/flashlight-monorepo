@@ -22,6 +22,7 @@ export class LobbyService implements IWithIO {
     this._io = webSocketService.io;
 
     this.initializeEvents();
+    console.log("siemanko");
   }
 
   initializeEvents() {
